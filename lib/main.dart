@@ -17,12 +17,18 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.teal.shade700),
           primaryColor: Colors.teal,
           backgroundColor: Colors.teal.shade700,
+          inputDecorationTheme: InputDecorationTheme(),
           textTheme: TextTheme(
               bodyText1: TextStyle(color: Colors.white60),
+              bodyText2: TextStyle(color: Colors.white),
               headline1: TextStyle(
                   fontSize: 18,
                   color: Colors.white,
-                  fontWeight: FontWeight.w700)),
+                  fontWeight: FontWeight.w700),
+              headline2: TextStyle(
+                  color: Colors.tealAccent.shade100,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900)),
         ),
         home: HomePage());
   }
