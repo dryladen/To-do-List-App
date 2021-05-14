@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'ToDo.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -11,6 +13,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
         title: Center(child: Text("To-do List App")),
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu))],
@@ -23,11 +26,9 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            jumlahItems++;
-          });
+          Navigator.of(context).push(_createRoute());
         },
-        backgroundColor: Theme.of(context).primaryColor,
+        
         child: Icon(Icons.add),
       ),
     );
@@ -53,4 +54,20 @@ class Items extends StatelessWidget {
       ),
     );
   }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => AddToDo(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.easeOut;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
