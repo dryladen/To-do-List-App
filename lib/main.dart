@@ -28,9 +28,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("To-do List App"),
+        title: Center(child: Text("To-do List App")),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu))],
       ),
-      body: Center(),
+      body: Column(
+        children: [
+          Text("List 1"),
+          Text("List 2"),
+          Text("List 3"),
+          Text("List 4"),
+          Text("List 5"),
+        ],
+      ),
     );
   }
 }
