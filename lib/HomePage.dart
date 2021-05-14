@@ -7,9 +7,9 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int jumlahItems = 0;
+int jumlahItems = 0;
 
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,17 +18,18 @@ class _HomePageState extends State<HomePage> {
         title: Center(child: Text("To-do List App")),
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu))],
       ),
-      body: ListView.builder(
-        itemCount: jumlahItems,
-        itemBuilder: (BuildContext context, int index) {
-          return Items();
-        },
+      body: ListView(
+        children: [
+          for (var i = 0; i < jumlahItems; i++)
+            Items(
+              index: i,
+            )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(_createRoute());
         },
-        
         child: Icon(Icons.add),
       ),
     );
@@ -36,14 +37,18 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Items extends StatelessWidget {
+  int index;
+
+  Items({this.index});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: ListTile(
-        title: Text("IPAN"),
+        title: Text(todo[index]),
         tileColor: Colors.cyan[200],
-        subtitle: Text("anjae"),
+        subtitle: Text(tanggal[index]),
         trailing: Checkbox(
           value: true,
           onChanged: (value) {

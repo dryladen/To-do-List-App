@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:todo/HomePage.dart';
+
+final controllerTodo = TextEditingController();
+final controllerTanggal = TextEditingController();
+
+List<String> todo = [];
+List<String> tanggal = [];
 
 class AddToDo extends StatefulWidget {
   @override
@@ -6,6 +13,22 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
+
+  void tambah() {
+    todo.add(controllerTodo.text);
+    controllerTodo.clear();
+
+    tanggal.add(controllerTanggal.text);
+    controllerTanggal.clear();
+
+    setState(() {
+      jumlahItems++;
+    });
+
+    Navigator.of(context).pop(context);
+    print(todo);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,6 +38,10 @@ class _AddToDoState extends State<AddToDo> {
           "Tugas Baru",
           style: Theme.of(context).textTheme.headline1,
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: tambah,
+        child: Icon(Icons.check),
       ),
       body: BodyInput(),
     );
@@ -33,15 +60,33 @@ class BodyInput extends StatelessWidget {
             "Apa yang ingin dikerjakan?",
             style: Theme.of(context).textTheme.headline2,
           ),
-          FormTodo()
+          FormTodo(
+            hintText: "Mau Ngapain?",
+            controller: controllerTodo,
+          ),
+          Padding(padding: EdgeInsets.only(top: 20)),
+          Text(
+            "Tanggal dan Waktu",
+            style: Theme.of(context).textTheme.headline2,
+          ),
+          FormTodo(
+            hintText: "Belum ada tanggal",
+            controller: controllerTanggal,
+          ),
         ],
       ),
     );
   }
 }
 
+// ignore: must_be_immutable
 class FormTodo extends StatelessWidget {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
+  String hintText;
+  TextEditingController controller;
+
+  FormTodo({this.hintText, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +95,10 @@ class FormTodo extends StatelessWidget {
       child: Form(
         key: _formkey,
         child: TextFormField(
+          controller: controller,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-              hintText: "Mau Ngapain?",
+              hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyText1,
               contentPadding: EdgeInsets.only(bottom: 2),
               isDense: true,
