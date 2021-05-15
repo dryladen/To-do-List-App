@@ -68,17 +68,37 @@ class _ItemsState extends State<Items> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+      margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
       decoration: BoxDecoration(
-          color: Colors.teal.shade200, borderRadius: BorderRadius.circular(5)),
+          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(5)),
       child: ListTile(
-        leading: Icon(Icons.tag_faces),
+        leading: Icon(
+          Icons.tag_faces,
+          color: Colors.white,
+        ),
         title: Text(
           '${data[widget.index]['ToDo']}',
-          style: Theme.of(context).textTheme.headline1,
+          style: Theme.of(context).textTheme.headline3,
         ),
-        subtitle: Text('${data[widget.index]['Tanggal']}'),
+        subtitle: Row(
+          children: [
+            Icon(
+              Icons.date_range_sharp,
+              size: 17.0,
+              color: Colors.white,
+            ),
+            Text('${data[widget.index]['Tanggal']}',
+                style: Theme.of(context).textTheme.headline4),
+          ],
+        ),
+        onTap: () {
+          setState(() {
+            this.value = !value;
+          });
+        },
         trailing: Checkbox(
+          focusColor: Colors.green,
+          side: BorderSide(color: Colors.teal.shade300),
           value: value,
           onChanged: (value) {
             setState(() {
