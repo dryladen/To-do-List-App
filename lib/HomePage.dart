@@ -23,17 +23,26 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        title: Text("To-do List App"),
+        title: Text(
+          "To-do List App",
+          style: Theme.of(context).textTheme.headline1,
+        ),
         actions: [
           Icon(Icons.search),
           IconButton(onPressed: () {}, icon: Icon(Icons.menu))
         ],
       ),
-      body: data.length == 0 ? Center(child: Image.asset('assets/img/Koala.png',height: 90,)) : ListView.builder(
-          itemCount: data.length == null ? 0 : data.length,
-          itemBuilder: (context, index) {
-            return Items(index: index);
-          }),
+      body: data.length == 0
+          ? Center(
+              child: Image.asset(
+              'assets/img/Koala.png',
+              height: 90,
+            ))
+          : ListView.builder(
+              itemCount: data.length == null ? 0 : data.length,
+              itemBuilder: (context, index) {
+                return Items(index: index);
+              }),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Map res = await Navigator.push(
@@ -46,27 +55,39 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class Items extends StatelessWidget {
+class Items extends StatefulWidget {
   int index;
-
   Items({this.index});
 
   @override
+  _ItemsState createState() => _ItemsState();
+}
+
+class _ItemsState extends State<Items> {
+  bool value = false;
+  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+      decoration: BoxDecoration(
+          color: Colors.teal.shade200, borderRadius: BorderRadius.circular(5)),
       child: ListTile(
-              title: Text('${data[index]['ToDo']}'),
-              tileColor: Colors.cyan[200],
-              subtitle: Text('${data[index]['Tanggal']}'),
-              trailing: Checkbox(
-                value: false,
-                onChanged: (value) {
-                  value = true;
-                },
-                activeColor: Colors.red,
-              ),
-            ),
+        leading: Icon(Icons.tag_faces),
+        title: Text(
+          '${data[widget.index]['ToDo']}',
+          style: Theme.of(context).textTheme.headline1,
+        ),
+        subtitle: Text('${data[widget.index]['Tanggal']}'),
+        trailing: Checkbox(
+          value: value,
+          onChanged: (value) {
+            setState(() {
+              this.value = value;
+            });
+          },
+          activeColor: Colors.red,
+        ),
+      ),
     );
   }
 }
