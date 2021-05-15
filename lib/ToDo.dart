@@ -61,6 +61,7 @@ class _BodyInputState extends State<BodyInput> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /* Form bagian mengisi todo */
           Text(
             "Apa yang ingin dikerjakan?",
             style: Theme.of(context).textTheme.headline2,
@@ -71,6 +72,9 @@ class _BodyInputState extends State<BodyInput> {
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
+          /* 
+          Form bagian mengisi tanggal
+          */
           Text(
             "Waktu dan Tanggal",
             style: Theme.of(context).textTheme.headline2,

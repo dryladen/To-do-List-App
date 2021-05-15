@@ -98,7 +98,7 @@ class _ItemsState extends State<Items> {
         },
         trailing: Checkbox(
           focusColor: Colors.green,
-          side: BorderSide(color: Colors.teal.shade300),
+          // side: BorderSide(color: Colors.teal.shade300),
           value: value,
           onChanged: (value) {
             setState(() {
