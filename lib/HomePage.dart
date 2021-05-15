@@ -7,7 +7,6 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-int jumlahItems = 0;
 List data = [];
 
 class _HomePageState extends State<HomePage> {
@@ -17,8 +16,6 @@ class _HomePageState extends State<HomePage> {
         data.add(value);
       }
     });
-    print(data);
-    print(data.length);
   }
 
   @override
@@ -32,7 +29,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.menu))
         ],
       ),
-      body: ListView.builder(
+      body: data.length == 0 ? Center(child: Image.asset('assets/img/Koala.png',height: 90,)) : ListView.builder(
           itemCount: data.length == null ? 0 : data.length,
           itemBuilder: (context, index) {
             return Items(index: index);
@@ -59,17 +56,17 @@ class Items extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: ListTile(
-        title: Text('${index}. ${data[index]['ToDo']}'),
-        tileColor: Colors.cyan[200],
-        subtitle: Text('${data[index]['Tanggal']}'),
-        trailing: Checkbox(
-          value: false,
-          onChanged: (value) {
-            value = true;
-          },
-          activeColor: Colors.red,
-        ),
-      ),
+              title: Text('${data[index]['ToDo']}'),
+              tileColor: Colors.cyan[200],
+              subtitle: Text('${data[index]['Tanggal']}'),
+              trailing: Checkbox(
+                value: false,
+                onChanged: (value) {
+                  value = true;
+                },
+                activeColor: Colors.red,
+              ),
+            ),
     );
   }
 }

@@ -19,7 +19,8 @@ class _AddToDoState extends State<AddToDo> {
           onPressed: () {
             Navigator.pop(context);
           },
-          color: Colors.red,
+          
+          
         ),
         title: Text(
           "Tugas Baru",
