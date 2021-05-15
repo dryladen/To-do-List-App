@@ -13,20 +13,23 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
-
   void tambah() {
-    todo.add(controllerTodo.text);
-    controllerTodo.clear();
+    print(controllerTodo.text);
+    if (controllerTodo.text != "" || controllerTanggal.text != "") {
+      setState(() {
+        todo.add(controllerTodo.text);
+        controllerTodo.clear();
 
-    tanggal.add(controllerTanggal.text);
-    controllerTanggal.clear();
+        tanggal.add(controllerTanggal.text);
+        controllerTanggal.clear();
+        jumlahItems++;
+      });
 
-    setState(() {
-      jumlahItems++;
-    });
-
-    Navigator.of(context).pop(context);
-    print(todo);
+      Navigator.of(context).pop(context);
+      print(todo);
+    } else {
+      print("Kosong");
+    }
   }
 
   @override
@@ -40,7 +43,10 @@ class _AddToDoState extends State<AddToDo> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: tambah,
+        onPressed: (){
+          Map value = {'ToDo': controllerTodo.text, 'Tanggal': controllerTanggal.text};
+          Navigator.pop(context, value);
+        },
         child: Icon(Icons.check),
       ),
       body: BodyInput(),
@@ -63,6 +69,7 @@ class BodyInput extends StatelessWidget {
           FormTodo(
             hintText: "Mau Ngapain?",
             controller: controllerTodo,
+            icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           Text(
@@ -72,6 +79,7 @@ class BodyInput extends StatelessWidget {
           FormTodo(
             hintText: "Belum ada tanggal",
             controller: controllerTanggal,
+            icon: Icons.date_range_rounded,
           ),
         ],
       ),
@@ -85,8 +93,9 @@ class FormTodo extends StatelessWidget {
 
   String hintText;
   TextEditingController controller;
+  IconData icon;
 
-  FormTodo({this.hintText, this.controller});
+  FormTodo({this.hintText, this.controller, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +107,10 @@ class FormTodo extends StatelessWidget {
           controller: controller,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
+              icon: Icon(
+                icon,
+                color: Colors.tealAccent.shade100,
+              ),
               hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyText1,
               contentPadding: EdgeInsets.only(bottom: 2),

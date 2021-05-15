@@ -8,27 +8,37 @@ class HomePage extends StatefulWidget {
 }
 
 int jumlahItems = 0;
+  List data = [];
 
 class _HomePageState extends State<HomePage> {
+
+  void resValue(Map value) {
+    setState(() {
+      data.add(value);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        title: Center(child: Text("To-do List App")),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu))],
-      ),
-      body: ListView(
-        children: [
-          for (var i = 0; i < jumlahItems; i++)
-            Items(
-              index: i,
-            )
+        title: Text("To-do List App"),
+        actions: [
+          Icon(Icons.search),
+          IconButton(onPressed: () {}, icon: Icon(Icons.menu))
         ],
       ),
+      body: ListView.builder(
+          itemCount: data.length == null ? 0 : data.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Items(index: index,);
+          }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(_createRoute());
+        onPressed: () async {
+          Map res = await Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AddToDo()));
+              resValue(res);
         },
         child: Icon(Icons.add),
       ),
@@ -43,14 +53,14 @@ class Items extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: ListTile(
-        title: Text(todo[index]),
+        title: Text('${data[index]['ToDo']}'),
         tileColor: Colors.cyan[200],
-        subtitle: Text(tanggal[index]),
+        subtitle: Text('${data[index]['Tanggal']}'),
         trailing: Checkbox(
-          value: true,
+          value: false,
           onChanged: (value) {
             value = true;
           },
