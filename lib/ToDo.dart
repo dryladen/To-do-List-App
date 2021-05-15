@@ -4,47 +4,36 @@ import 'package:todo/HomePage.dart';
 final controllerTodo = TextEditingController();
 final controllerTanggal = TextEditingController();
 
-List<String> todo = [];
-List<String> tanggal = [];
-
 class AddToDo extends StatefulWidget {
   @override
   _AddToDoState createState() => _AddToDoState();
 }
 
 class _AddToDoState extends State<AddToDo> {
-  void tambah() {
-    print(controllerTodo.text);
-    if (controllerTodo.text != "" || controllerTanggal.text != "") {
-      setState(() {
-        todo.add(controllerTodo.text);
-        controllerTodo.clear();
-
-        tanggal.add(controllerTanggal.text);
-        controllerTanggal.clear();
-        jumlahItems++;
-      });
-
-      Navigator.of(context).pop(context);
-      print(todo);
-    } else {
-      print("Kosong");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          color: Colors.red,
+        ),
         title: Text(
           "Tugas Baru",
           style: Theme.of(context).textTheme.headline1,
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          Map value = {'ToDo': controllerTodo.text, 'Tanggal': controllerTanggal.text};
+        onPressed: () {
+          Map value = {
+            'ToDo': controllerTodo.text,
+            'Tanggal': controllerTanggal.text
+          };
+          controllerTodo.clear();
+          controllerTanggal.clear();
           Navigator.pop(context, value);
         },
         child: Icon(Icons.check),

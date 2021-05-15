@@ -8,14 +8,17 @@ class HomePage extends StatefulWidget {
 }
 
 int jumlahItems = 0;
-  List data = [];
+List data = [];
 
 class _HomePageState extends State<HomePage> {
-
   void resValue(Map value) {
     setState(() {
-      data.add(value);
+      if (value != null) {
+        data.add(value);
+      }
     });
+    print(data);
+    print(data.length);
   }
 
   @override
@@ -31,14 +34,14 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView.builder(
           itemCount: data.length == null ? 0 : data.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Items(index: index,);
+          itemBuilder: (context, index) {
+            return Items(index: index);
           }),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Map res = await Navigator.push(
               context, MaterialPageRoute(builder: (context) => AddToDo()));
-              resValue(res);
+          resValue(res);
         },
         child: Icon(Icons.add),
       ),
@@ -56,7 +59,7 @@ class Items extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: ListTile(
-        title: Text('${data[index]['ToDo']}'),
+        title: Text('${index}. ${data[index]['ToDo']}'),
         tileColor: Colors.cyan[200],
         subtitle: Text('${data[index]['Tanggal']}'),
         trailing: Checkbox(
