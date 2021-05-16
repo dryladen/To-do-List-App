@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'Task.dart';
+import 'db_helper.dart';
 
+Future<List<Task>> tasks;
+String todo;
+String tanggal;
+int currTodoId;
+
+var dbHelper;
+bool isUpdating;
+
+/* Controller for the todo and date */
 TextEditingController controllerTodo = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 
@@ -10,6 +21,24 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
+  @override
+  void initState() {
+    super.initState();
+    dbHelper = DBHelper();
+    isUpdating = false;
+  }
+
+  refreshList() {
+    setState(() {
+      tasks = dbHelper.getTasks();
+    });
+  }
+
+  void clearForm() {
+    controllerTanggal.clear();
+    controllerTanggal.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,8 +60,7 @@ class _AddToDoState extends State<AddToDo> {
             'todo': controllerTodo.text,
             'tanggal': controllerTanggal.text
           };
-          controllerTodo.clear();
-          controllerTanggal.clear();
+          clearForm();
           Navigator.pop(context, value);
         },
         child: Icon(
@@ -72,9 +100,8 @@ class _BodyInputState extends State<BodyInput> {
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
-          /* 
-          Form bagian mengisi tanggal
-          */
+
+          // Form bagian mengisi tanggal
           Text(
             "Waktu dan Tanggal",
             style: Theme.of(context).textTheme.headline2,
