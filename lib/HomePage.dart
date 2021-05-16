@@ -38,11 +38,7 @@ class _HomePageState extends State<HomePage> {
               'assets/img/Koala.png',
               height: 90,
             ))
-          : ListView.builder(
-              itemCount: data.length == null ? 0 : data.length,
-              itemBuilder: (context, index) {
-                return Items(index: index);
-              }),
+          : listView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Map res = await Navigator.push(
@@ -53,6 +49,14 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+listView() {
+  return ListView.builder(
+      itemCount: data.length == null ? 0 : data.length,
+      itemBuilder: (context, index) {
+        return Items(index: index);
+      });
 }
 
 class Items extends StatefulWidget {

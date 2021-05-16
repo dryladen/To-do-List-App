@@ -28,8 +28,8 @@ class _AddToDoState extends State<AddToDo> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Map value = {
-            'ToDo': controllerTodo.text,
-            'Tanggal': controllerTanggal.text
+            'todo': controllerTodo.text,
+            'tanggal': controllerTanggal.text
           };
           controllerTodo.clear();
           controllerTanggal.clear();
