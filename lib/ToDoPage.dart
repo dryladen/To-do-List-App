@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'Task.dart';
-import 'db_helper.dart';
-
-Future<List<Task>> tasks;
-String todo;
-String tanggal;
-int currTodoId;
-
-var dbHelper;
-bool isUpdating;
-
+import 'package:todo/HomePage.dart';
+import 'package:todo/model/Todo.dart';
+import 'package:todo/services/db_helper.dart';
 /* Controller for the todo and date */
-TextEditingController controllerTodo = TextEditingController();
+TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 
 class AddToDo extends StatefulWidget {
@@ -21,22 +13,15 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
-  @override
-  void initState() {
-    super.initState();
-    dbHelper = DBHelper();
-    isUpdating = false;
-  }
-
-  refreshList() {
-    setState(() {
-      tasks = dbHelper.getTasks();
-    });
-  }
-
   void clearForm() {
+    controllerTask.clear();
     controllerTanggal.clear();
-    controllerTanggal.clear();
+  }
+
+  void _save() async {
+    ToDo item = ToDo(task: controllerTask.text, tanggal: controllerTanggal.text);
+    await DB.insert(ToDo.table, item);
+    refresh();
   }
 
   @override
@@ -56,12 +41,9 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Map value = {
-            'todo': controllerTodo.text,
-            'tanggal': controllerTanggal.text
-          };
+          _save();
+          Navigator.of(context).pop();
           clearForm();
-          Navigator.pop(context, value);
         },
         child: Icon(
           Icons.check,
@@ -96,7 +78,7 @@ class _BodyInputState extends State<BodyInput> {
           ),
           FormTodo(
             hintText: "Mau Ngapain?",
-            controller: controllerTodo,
+            controller: controllerTask,
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),

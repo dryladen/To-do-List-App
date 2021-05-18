@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:todo/ToDoPage.dart';
+import 'package:todo/model/Todo.dart';
+import 'package:todo/services/db_helper.dart';
 
-import 'ToDo.dart';
-
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
+// String _task;
+String tanggal;
+List<ToDo> _tasks = [];
+void refresh() async {
+  List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
+  _tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+  print(_tasks.length);
+  for (int i = 0;  i<_tasks.length;i++){
+    print('$i. ${_tasks[i].task}');
+  }
+  print("SUDAH REFRESH");
 }
 
-List data = [];
-
 class _HomePageState extends State<HomePage> {
-  void resValue(Map value) {
-    setState(() {
-      if (value != null) {
-        data.add(value);
-      }
-    });
+  @override
+  void initState() {
+    refresh();
+    super.initState();
+  }
+
+  ListView listView() {
+    return ListView.builder(
+        itemCount: _tasks.length == null ? 0 : _tasks.length,
+        itemBuilder: (context, index) {
+          return Items(index: index);
+        });
   }
 
   @override
@@ -32,7 +45,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.menu))
         ],
       ),
-      body: data.length == 0
+      body: _tasks.length == 0
           ? Center(
               child: Image.asset(
               'assets/img/Koala.png',
@@ -41,30 +54,12 @@ class _HomePageState extends State<HomePage> {
           : listView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Map res = await Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddToDo()));
-          resValue(res);
+          Navigator.of(context).push(_createRoute());
         },
         child: Icon(Icons.add),
       ),
     );
   }
-}
-
-listView() {
-  return ListView.builder(
-      itemCount: data.length == null ? 0 : data.length,
-      itemBuilder: (context, index) {
-        return Items(index: index);
-      });
-}
-
-class Items extends StatefulWidget {
-  int index;
-  Items({this.index});
-
-  @override
-  _ItemsState createState() => _ItemsState();
 }
 
 class _ItemsState extends State<Items> {
@@ -81,7 +76,7 @@ class _ItemsState extends State<Items> {
           color: Colors.white,
         ),
         title: Text(
-          '${data[widget.index]['ToDo']}',
+          '${_tasks[widget.index].task}',
           style: Theme.of(context).textTheme.headline3,
         ),
         subtitle: Row(
@@ -91,8 +86,7 @@ class _ItemsState extends State<Items> {
               size: 17.0,
               color: Colors.white,
             ),
-            Text('${data[widget.index]['Tanggal']}',
-                style: Theme.of(context).textTheme.headline4),
+            Text('${_tasks[widget.index].tanggal}', style: Theme.of(context).textTheme.headline4),
           ],
         ),
         onTap: () {
@@ -130,4 +124,17 @@ Route _createRoute() {
       );
     },
   );
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class Items extends StatefulWidget {
+  int index;
+  Items({this.index});
+
+  @override
+  _ItemsState createState() => _ItemsState();
 }

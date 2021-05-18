@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
-import 'HomePage.dart';
+import 'package:todo/services/db_helper.dart';
+import 'package:todo/HomePage.dart';
 
-void main() => runApp(MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await DB.init();
+  print("Init");
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
