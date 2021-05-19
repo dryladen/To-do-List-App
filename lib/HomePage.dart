@@ -5,7 +5,6 @@ import 'package:todo/services/db_helper.dart';
 
 /* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
 List<ToDo> tasks = [];
-int jumlahItems = 0;
 /* Untuk merefresh database dan dimasukkan ke variable tasks */
 
 class _HomePageState extends State<HomePage> {
@@ -24,9 +23,7 @@ class _HomePageState extends State<HomePage> {
     }
     print("SUDAH REFRESH");
 
-    setState(() {
-      jumlahItems = tasks.length;
-    });
+    setState(() {});
   }
 
   void _save(ToDo item) async {
