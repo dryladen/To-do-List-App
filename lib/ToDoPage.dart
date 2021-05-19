@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
-import 'package:todo/HomePage.dart';
 import 'package:todo/model/Todo.dart';
-import 'package:todo/services/db_helper.dart';
 /* Controller for the todo and date */
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();

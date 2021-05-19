@@ -5,8 +5,8 @@ import 'package:todo/services/db_helper.dart';
 
 /* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
 List<ToDo> tasks = [];
-/* Untuk merefresh database dan dimasukkan ke variable tasks */
 
+/* Untuk merefresh database dan dimasukkan ke variable tasks */
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
@@ -27,8 +27,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _save(ToDo item) async {
-    await DB.insert(ToDo.table, item);
-    refresh();
+    if (item != null) {
+      await DB.insert(ToDo.table, item);
+      refresh();
+    }
   }
 
   listView() {
@@ -53,6 +55,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.menu))
         ],
       ),
+      /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
       body: tasks.length == 0
           ? Center(
               child: Image.asset(
@@ -62,6 +65,7 @@ class _HomePageState extends State<HomePage> {
           : listView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
           ToDo items = await Navigator.push(
               context, MaterialPageRoute(builder: (context) => AddToDo()));
           _save(items);
@@ -86,6 +90,7 @@ class _ItemsState extends State<Items> {
           color: Colors.white,
         ),
         title: Text(
+          /* Menampilkan teks dari task */
           '${tasks[widget.index].task}',
           style: Theme.of(context).textTheme.headline3,
         ),
@@ -96,6 +101,7 @@ class _ItemsState extends State<Items> {
               size: 17.0,
               color: Colors.white,
             ),
+            /* Menampilkan teks tanggal */
             Text('${tasks[widget.index].tanggal}',
                 style: Theme.of(context).textTheme.headline4),
           ],
@@ -119,22 +125,6 @@ class _ItemsState extends State<Items> {
       ),
     );
   }
-}
-
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => AddToDo(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(1.0, 0.0);
-      var end = Offset.zero;
-      var curve = Curves.easeOut;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
 }
 
 class HomePage extends StatefulWidget {

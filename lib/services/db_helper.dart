@@ -14,7 +14,6 @@ abstract class DB {
     }
     try {
       String _path = await getDatabasesPath();
-      // Directory _path = await getApplicationDocumentsDirectory();
       print('PATH : $_path');
       _db = await openDatabase(join(await getDatabasesPath(), 'todotable.db'), version: _version, onCreate: onCreate);
       print('DB: $_db');
