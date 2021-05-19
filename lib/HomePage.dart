@@ -3,18 +3,10 @@ import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
 
-// String _task;
-String tanggal;
-List<ToDo> _tasks = [];
-void refresh() async {
-  List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
-  _tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-  print(_tasks.length);
-  for (int i = 0;  i<_tasks.length;i++){
-    print('$i. ${_tasks[i].task}');
-  }
-  print("SUDAH REFRESH");
-}
+/* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
+List<ToDo> tasks = [];
+int jumlahItems = 0;
+/* Untuk merefresh database dan dimasukkan ke variable tasks */
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -23,9 +15,28 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  ListView listView() {
+  void refresh() async {
+    List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
+    tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+    print(tasks.length);
+    for (int i = 0; i < tasks.length; i++) {
+      print('$i. ${tasks[i].task}');
+    }
+    print("SUDAH REFRESH");
+
+    setState(() {
+      jumlahItems = tasks.length;
+    });
+  }
+
+  void _save(ToDo item) async {
+    await DB.insert(ToDo.table, item);
+    refresh();
+  }
+
+  listView() {
     return ListView.builder(
-        itemCount: _tasks.length == null ? 0 : _tasks.length,
+        itemCount: tasks.length == null ? 0 : tasks.length,
         itemBuilder: (context, index) {
           return Items(index: index);
         });
@@ -45,7 +56,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.menu))
         ],
       ),
-      body: _tasks.length == 0
+      body: tasks.length == 0
           ? Center(
               child: Image.asset(
               'assets/img/Koala.png',
@@ -54,7 +65,9 @@ class _HomePageState extends State<HomePage> {
           : listView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.of(context).push(_createRoute());
+          ToDo items = await Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AddToDo()));
+          _save(items);
         },
         child: Icon(Icons.add),
       ),
@@ -76,7 +89,7 @@ class _ItemsState extends State<Items> {
           color: Colors.white,
         ),
         title: Text(
-          '${_tasks[widget.index].task}',
+          '${tasks[widget.index].task}',
           style: Theme.of(context).textTheme.headline3,
         ),
         subtitle: Row(
@@ -86,7 +99,8 @@ class _ItemsState extends State<Items> {
               size: 17.0,
               color: Colors.white,
             ),
-            Text('${_tasks[widget.index].tanggal}', style: Theme.of(context).textTheme.headline4),
+            Text('${tasks[widget.index].tanggal}',
+                style: Theme.of(context).textTheme.headline4),
           ],
         ),
         onTap: () {

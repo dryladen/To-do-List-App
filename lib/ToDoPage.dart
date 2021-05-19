@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:todo/HomePage.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
@@ -18,12 +19,7 @@ class _AddToDoState extends State<AddToDo> {
     controllerTanggal.clear();
   }
 
-  void _save() async {
-    ToDo item = ToDo(task: controllerTask.text, tanggal: controllerTanggal.text);
-    await DB.insert(ToDo.table, item);
-    refresh();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,9 +37,9 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _save();
-          Navigator.of(context).pop();
+          ToDo item = ToDo(task: controllerTask.text, tanggal: controllerTanggal.text);
           clearForm();
+          Navigator.pop(context, item);
         },
         child: Icon(
           Icons.check,

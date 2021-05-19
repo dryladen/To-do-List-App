@@ -5,8 +5,10 @@ import 'package:todo/HomePage.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
+  /* Inisialisasi Database
+  Mulai dari menentukan lokasi database,
+  sampai membuat tabel beserta atribut didalamnya */
   await DB.init();
-  print("Init");
   runApp(MyApp());
 }
 
