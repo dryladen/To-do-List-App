@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
-import 'HomePage.dart';
+import 'package:todo/services/db_helper.dart';
+import 'package:todo/HomePage.dart';
 
-void main() => runApp(MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /* Inisialisasi Database
+  Mulai dari menentukan lokasi database,
+  sampai membuat tabel beserta atribut didalamnya */
+  await DB.init();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

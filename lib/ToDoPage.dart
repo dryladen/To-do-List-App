@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-TextEditingController controllerTodo = TextEditingController();
+import 'package:todo/model/Todo.dart';
+/* Controller for the todo and date */
+TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 
 class AddToDo extends StatefulWidget {
@@ -10,6 +11,12 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
+  void clearForm() {
+    controllerTask.clear();
+    controllerTanggal.clear();
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,13 +34,9 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Map value = {
-            'ToDo': controllerTodo.text,
-            'Tanggal': controllerTanggal.text
-          };
-          controllerTodo.clear();
-          controllerTanggal.clear();
-          Navigator.pop(context, value);
+          ToDo item = ToDo(task: controllerTask.text, tanggal: controllerTanggal.text);
+          clearForm();
+          Navigator.pop(context, item);
         },
         child: Icon(
           Icons.check,
@@ -61,16 +64,19 @@ class _BodyInputState extends State<BodyInput> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /* Form bagian mengisi todo */
           Text(
             "Apa yang ingin dikerjakan?",
             style: Theme.of(context).textTheme.headline2,
           ),
           FormTodo(
             hintText: "Mau Ngapain?",
-            controller: controllerTodo,
+            controller: controllerTask,
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
+
+          // Form bagian mengisi tanggal
           Text(
             "Waktu dan Tanggal",
             style: Theme.of(context).textTheme.headline2,
