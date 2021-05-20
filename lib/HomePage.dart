@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
@@ -18,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     refresh();
     super.initState();
+    print("InitState");
   }
 
   @override
@@ -30,7 +29,7 @@ class _HomePageState extends State<HomePage> {
           style: Theme.of(context).textTheme.headline1,
         ),
         actions: [
-          Icon(Icons.check),
+          Icon(Icons.search),
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */
           IconButton(
               onPressed: () async {}, icon: Icon(Icons.more_vert_rounded))
@@ -62,7 +61,7 @@ class _HomePageState extends State<HomePage> {
     List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
     tasks = _results.map((item) => ToDo.fromMap(item)).toList();
     for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].isDone} ');
+      print('$i. ${tasks[i].task} ');
     }
 
     setState(() {});
@@ -77,7 +76,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _update(ToDo item) async {}
+  void _update(ToDo task) async {
+    print("Update id sebelum: ${task.id}");
+    ToDo items = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => AddToDo(
+                  task: task,
+                  isUpdate: true,
+                )));
+    try {
+      await DB.update(ToDo.table, items);
+    } catch (er) {
+      print(er);
+    }
+    // print("Result $result");
+    refresh();
+  }
 
   void _delete(ToDo item, int index) async {
     var task = tasks.removeAt(index);
@@ -87,8 +103,8 @@ class _HomePageState extends State<HomePage> {
         child: _buildItem(task),
       );
     });
-    // DB.delete(ToDo.table, item);
-    // refresh();
+    DB.delete(ToDo.table, item);
+    refresh();
   }
 
   Widget _buildItem(ToDo tasks, [int index]) {
@@ -97,6 +113,7 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
           color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
       child: ListTile(
+          onTap: () => _update(tasks),
           key: ValueKey<ToDo>(tasks),
           title: Text(
             /* Menampilkan teks dari task */

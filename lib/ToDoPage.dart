@@ -6,13 +6,19 @@ import 'package:todo/model/Todo.dart';
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 
-class AddToDo extends StatefulWidget {
-  @override
-  _AddToDoState createState() => _AddToDoState();
-}
-
 class _AddToDoState extends State<AddToDo> {
+  @override
+  void initState() {
+
+    if (widget.isUpdate != false) {
+      print("InitTodo");
+      controllerTask.text = widget.task.task;
+      controllerTanggal.text = widget.task.tanggal;
+    }
+  }
+
   void clearForm() {
+    // controllerTask.text = task.task;
     controllerTask.clear();
     controllerTanggal.clear();
   }
@@ -25,6 +31,7 @@ class _AddToDoState extends State<AddToDo> {
         leading: BackButton(
           onPressed: () {
             Navigator.pop(context);
+            print("Kembali");
             clearForm();
           },
         ),
@@ -36,12 +43,14 @@ class _AddToDoState extends State<AddToDo> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           ToDo item = ToDo(
+              id: widget.task.id,
               task: controllerTask.text,
               tanggal: controllerTanggal.text,
               jam: "09:30",
               isDone: false);
-          clearForm();
+          print("Page: ${item.id}");
           Navigator.pop(context, item);
+          clearForm();
         },
         child: Icon(
           Icons.check,
@@ -50,11 +59,6 @@ class _AddToDoState extends State<AddToDo> {
       body: BodyInput(),
     );
   }
-}
-
-class BodyInput extends StatefulWidget {
-  @override
-  _BodyInputState createState() => _BodyInputState();
 }
 
 class _BodyInputState extends State<BodyInput> {
@@ -93,12 +97,15 @@ class _BodyInputState extends State<BodyInput> {
             readOnly: true,
             onTap: () async {
               final DateTime date = await showDatePicker(
+                  helpText: "Pilih tanggal",
                   context: context,
                   initialDate: tanggal,
                   firstDate: DateTime(2010), // batas awal tahun
                   lastDate: DateTime(2022)); // batas akhir tahun
               setState(() {
-                tanggal = date;
+                if (date != null) {
+                  tanggal = date;
+                }
               });
               controllerTanggal.text = formatTanggal.format(date);
             },
@@ -126,7 +133,6 @@ class _BodyInputState extends State<BodyInput> {
 }
 
 // ignore: must_be_immutable
-
 
 class FormTodo extends StatelessWidget {
   String hintText;
@@ -171,4 +177,18 @@ class FormTodo extends StatelessWidget {
       ),
     );
   }
+}
+
+class AddToDo extends StatefulWidget {
+  bool isUpdate;
+  ToDo task;
+  AddToDo({this.isUpdate = false, this.task});
+
+  @override
+  _AddToDoState createState() => _AddToDoState();
+}
+
+class BodyInput extends StatefulWidget {
+  @override
+  _BodyInputState createState() => _BodyInputState();
 }
