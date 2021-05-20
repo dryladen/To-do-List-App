@@ -8,9 +8,9 @@ import 'package:todo/services/db_helper.dart';
 /* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
 
 /* Untuk merefresh database dan dimasukkan ke variable tasks */
-List<ToDo> tasks = [];
 
 class _HomePageState extends State<HomePage> {
+  List<ToDo> tasks = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
   Color white = Colors.white;
 
@@ -48,7 +48,9 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
           ToDo items = await Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddToDo()));
+              context,
+              MaterialPageRoute(
+                  fullscreenDialog: true, builder: (context) => AddToDo()));
           _save(items);
         },
         child: Icon(Icons.add),
@@ -74,6 +76,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {});
     }
   }
+
+  void _update(ToDo item) async {}
 
   void _delete(ToDo item, int index) async {
     var task = tasks.removeAt(index);

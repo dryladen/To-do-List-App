@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:todo/services/db_helper.dart';
 import 'package:todo/HomePage.dart';
+import 'package:todo/model/transition.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /* Inisialisasi Database
@@ -19,6 +20,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'To-do List App',
         theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            TargetPlatform.android: RotationFadeTransitionBuilder()
+          }),
           floatingActionButtonTheme: FloatingActionButtonThemeData(
               backgroundColor: Colors.white,
               foregroundColor: Colors.teal.shade700),

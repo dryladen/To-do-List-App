@@ -126,18 +126,14 @@ class _BodyInputState extends State<BodyInput> {
 }
 
 // ignore: must_be_immutable
-class FormTodo extends StatefulWidget {
+
+
+class FormTodo extends StatelessWidget {
   String hintText;
   TextEditingController controller;
   IconData icon;
 
   FormTodo({this.hintText, this.controller, this.icon});
-
-  @override
-  _FormTodoState createState() => _FormTodoState();
-}
-
-class _FormTodoState extends State<FormTodo> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   @override
@@ -147,14 +143,14 @@ class _FormTodoState extends State<FormTodo> {
       child: Form(
         key: _formkey,
         child: TextFormField(
-          controller: widget.controller,
+          controller: controller,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
               icon: Icon(
-                widget.icon,
+                icon,
                 color: Colors.tealAccent.shade100,
               ),
-              hintText: widget.hintText,
+              hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyText1,
               contentPadding: EdgeInsets.only(bottom: 2),
               isDense: true,
