@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo/model/Todo.dart';
+
 /* Controller for the todo and date */
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
@@ -16,7 +17,6 @@ class _AddToDoState extends State<AddToDo> {
     controllerTanggal.clear();
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +25,7 @@ class _AddToDoState extends State<AddToDo> {
         leading: BackButton(
           onPressed: () {
             Navigator.pop(context);
+            clearForm();
           },
         ),
         title: Text(
@@ -34,7 +35,11 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ToDo item = ToDo(task: controllerTask.text, tanggal: controllerTanggal.text);
+          ToDo item = ToDo(
+              task: controllerTask.text,
+              tanggal: controllerTanggal.text,
+              jam: "09:30",
+              isDone: false);
           clearForm();
           Navigator.pop(context, item);
         },
@@ -53,6 +58,13 @@ class BodyInput extends StatefulWidget {
 }
 
 class _BodyInputState extends State<BodyInput> {
+  Widget headerForm(String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.headline2,
+    );
+  }
+
   DateTime tanggal = DateTime.now(); // Mengambil waktu saat ini
   final DateFormat formatTanggal =
       DateFormat('MMM dd, yyyy'); // Mengatur format
@@ -65,26 +77,20 @@ class _BodyInputState extends State<BodyInput> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* Form bagian mengisi todo */
-          Text(
-            "Apa yang ingin dikerjakan?",
-            style: Theme.of(context).textTheme.headline2,
-          ),
+          headerForm("Apa yang ingin dikerjakan?"),
           FormTodo(
             hintText: "Mau Ngapain?",
             controller: controllerTask,
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
-
           // Form bagian mengisi tanggal
-          Text(
-            "Waktu dan Tanggal",
-            style: Theme.of(context).textTheme.headline2,
-          ),
+          headerForm("Waktu dan Tanggal"),
           Padding(padding: EdgeInsets.only(top: 10)),
           TextFormField(
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             controller: controllerTanggal,
+            readOnly: true,
             onTap: () async {
               final DateTime date = await showDatePicker(
                   context: context,
@@ -101,8 +107,7 @@ class _BodyInputState extends State<BodyInput> {
                   Icons.date_range_rounded,
                   color: Colors.tealAccent.shade100,
                 ),
-                hintText:
-                    formatTanggal.format(tanggal), // Menampilkan data saat ini
+                hintText: "Tanggal belum ditentukan",
                 hintStyle: Theme.of(context).textTheme.bodyText1,
                 contentPadding: EdgeInsets.only(bottom: 2),
                 isDense: true,
