@@ -9,7 +9,6 @@ TextEditingController controllerTanggal = TextEditingController();
 class _AddToDoState extends State<AddToDo> {
   @override
   void initState() {
-
     if (widget.isUpdate != false) {
       print("InitTodo");
       controllerTask.text = widget.task.task;
@@ -31,7 +30,6 @@ class _AddToDoState extends State<AddToDo> {
         leading: BackButton(
           onPressed: () {
             Navigator.pop(context);
-            print("Kembali");
             clearForm();
           },
         ),
@@ -42,13 +40,20 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ToDo item = ToDo(
-              id: widget.task.id,
-              task: controllerTask.text,
-              tanggal: controllerTanggal.text,
-              jam: "09:30",
-              isDone: false);
-          print("Page: ${item.id}");
+          /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
+          Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
+          ToDo item = widget.isUpdate != true
+              ? ToDo(
+                  task: controllerTask.text,
+                  tanggal: controllerTanggal.text,
+                  jam: "09:30",
+                  isDone: false)
+              : ToDo(
+                  id: widget.task.id,
+                  task: controllerTask.text,
+                  tanggal: controllerTanggal.text,
+                  jam: "10:00",
+                  isDone: false);
           Navigator.pop(context, item);
           clearForm();
         },

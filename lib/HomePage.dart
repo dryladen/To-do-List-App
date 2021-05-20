@@ -77,7 +77,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _update(ToDo task) async {
-    print("Update id sebelum: ${task.id}");
     ToDo items = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -91,7 +90,6 @@ class _HomePageState extends State<HomePage> {
     } catch (er) {
       print(er);
     }
-    // print("Result $result");
     refresh();
   }
 
