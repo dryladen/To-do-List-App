@@ -4,41 +4,19 @@ import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
 
 /* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
-List<ToDo> tasks = [];
 
 /* Untuk merefresh database dan dimasukkan ke variable tasks */
+
 class _HomePageState extends State<HomePage> {
+  List<ToDo> tasks = [];
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  Color white = Colors.white;
+
   @override
   void initState() {
     refresh();
     super.initState();
-  }
-
-  void refresh() async {
-    List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
-    tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-    print(tasks.length);
-    for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].task}');
-    }
-    print("SUDAH REFRESH");
-
-    setState(() {});
-  }
-
-  void _save(ToDo item) async {
-    if (item != null) {
-      await DB.insert(ToDo.table, item);
-      refresh();
-    }
-  }
-
-  listView() {
-    return ListView.builder(
-        itemCount: tasks.length == null ? 0 : tasks.length,
-        itemBuilder: (context, index) {
-          return Items(index: index);
-        });
+    print("InitState");
   }
 
   @override
@@ -52,7 +30,9 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           Icon(Icons.search),
-          IconButton(onPressed: () {}, icon: Icon(Icons.menu))
+          /* SEMENTARA AJA, BUAT NGETEST DATABASE */
+          IconButton(
+              onPressed: () async {}, icon: Icon(Icons.more_vert_rounded))
         ],
       ),
       /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
@@ -67,62 +47,114 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
           ToDo items = await Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddToDo()));
+              context,
+              MaterialPageRoute(
+                  fullscreenDialog: true, builder: (context) => AddToDo()));
           _save(items);
         },
         child: Icon(Icons.add),
       ),
     );
   }
-}
 
-class _ItemsState extends State<Items> {
-  bool value = false;
-  @override
-  Widget build(BuildContext context) {
+  void refresh() async {
+    List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
+    tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+    for (int i = 0; i < tasks.length; i++) {
+      print('$i. ${tasks[i].task} ');
+    }
+
+    setState(() {});
+  }
+
+  void _save(ToDo item) async {
+    if (item != null) {
+      await DB.insert(ToDo.table, item);
+      refresh();
+      _listKey.currentState.insertItem(tasks.length - 1);
+      setState(() {});
+    }
+  }
+
+  void _update(ToDo task) async {
+    ToDo items = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => AddToDo(
+                  task: task,
+                  isUpdate: true,
+                )));
+    try {
+      await DB.update(ToDo.table, items);
+    } catch (er) {
+      print(er);
+    }
+    refresh();
+  }
+
+  void _delete(ToDo item, int index) async {
+    var task = tasks.removeAt(index);
+    _listKey.currentState.removeItem(index, (context, animation) {
+      return FadeTransition(
+        opacity: animation,
+        child: _buildItem(task),
+      );
+    });
+    DB.delete(ToDo.table, item);
+    refresh();
+  }
+
+  Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
       decoration: BoxDecoration(
-          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(5)),
+          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
       child: ListTile(
-        leading: Icon(
-          Icons.tag_faces,
-          color: Colors.white,
-        ),
-        title: Text(
-          /* Menampilkan teks dari task */
-          '${tasks[widget.index].task}',
-          style: Theme.of(context).textTheme.headline3,
-        ),
-        subtitle: Row(
-          children: [
-            Icon(
-              Icons.date_range_sharp,
-              size: 17.0,
-              color: Colors.white,
-            ),
-            /* Menampilkan teks tanggal */
-            Text('${tasks[widget.index].tanggal}',
-                style: Theme.of(context).textTheme.headline4),
-          ],
-        ),
-        onTap: () {
-          setState(() {
-            this.value = !value;
-          });
-        },
-        trailing: Checkbox(
-          focusColor: Colors.green,
-          // side: BorderSide(color: Colors.teal.shade300),
-          value: value,
-          onChanged: (value) {
-            setState(() {
-              this.value = value;
-            });
-          },
-          activeColor: Colors.red,
-        ),
-      ),
+          onTap: () => _update(tasks),
+          key: ValueKey<ToDo>(tasks),
+          title: Text(
+            /* Menampilkan teks dari task */
+            '${tasks.task}',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          subtitle: Row(
+            children: [
+              /* Menampilkan teks tanggal */
+              Text('${tasks.tanggal}  -  ${tasks.jam}',
+                  style: Theme.of(context).textTheme.headline4),
+            ],
+          ),
+          trailing: IconButton(
+            onPressed: () {
+              setState(() {
+                tasks.isDone = true;
+              });
+              _delete(tasks, index);
+            },
+            icon: tasks.isDone != true
+                ? Icon(
+                    Icons.radio_button_off_rounded,
+                    color: white,
+                  )
+                : Icon(
+                    Icons.check_circle,
+                    color: white,
+                  ),
+          )),
+    );
+  }
+
+  listView() {
+    return AnimatedList(
+      key: _listKey,
+      initialItemCount: tasks.length,
+      itemBuilder: (context, index, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: _buildItem(tasks[index], index),
+        );
+      },
     );
   }
 }
@@ -130,12 +162,4 @@ class _ItemsState extends State<Items> {
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
-}
-
-class Items extends StatefulWidget {
-  int index;
-  Items({this.index});
-
-  @override
-  _ItemsState createState() => _ItemsState();
 }

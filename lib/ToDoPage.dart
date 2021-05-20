@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo/model/Todo.dart';
+
 /* Controller for the todo and date */
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 
-class AddToDo extends StatefulWidget {
-  @override
-  _AddToDoState createState() => _AddToDoState();
-}
-
 class _AddToDoState extends State<AddToDo> {
+  @override
+  void initState() {
+    if (widget.isUpdate != false) {
+      print("InitTodo");
+      controllerTask.text = widget.task.task;
+      controllerTanggal.text = widget.task.tanggal;
+    }
+  }
+
   void clearForm() {
+    // controllerTask.text = task.task;
     controllerTask.clear();
     controllerTanggal.clear();
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +30,7 @@ class _AddToDoState extends State<AddToDo> {
         leading: BackButton(
           onPressed: () {
             Navigator.pop(context);
+            clearForm();
           },
         ),
         title: Text(
@@ -34,9 +40,22 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ToDo item = ToDo(task: controllerTask.text, tanggal: controllerTanggal.text);
-          clearForm();
+          /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
+          Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
+          ToDo item = widget.isUpdate != true
+              ? ToDo(
+                  task: controllerTask.text,
+                  tanggal: controllerTanggal.text,
+                  jam: "09:30",
+                  isDone: false)
+              : ToDo(
+                  id: widget.task.id,
+                  task: controllerTask.text,
+                  tanggal: controllerTanggal.text,
+                  jam: "10:00",
+                  isDone: false);
           Navigator.pop(context, item);
+          clearForm();
         },
         child: Icon(
           Icons.check,
@@ -47,12 +66,14 @@ class _AddToDoState extends State<AddToDo> {
   }
 }
 
-class BodyInput extends StatefulWidget {
-  @override
-  _BodyInputState createState() => _BodyInputState();
-}
-
 class _BodyInputState extends State<BodyInput> {
+  Widget headerForm(String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.headline2,
+    );
+  }
+
   DateTime tanggal = DateTime.now(); // Mengambil waktu saat ini
   final DateFormat formatTanggal =
       DateFormat('MMM dd, yyyy'); // Mengatur format
@@ -65,34 +86,31 @@ class _BodyInputState extends State<BodyInput> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* Form bagian mengisi todo */
-          Text(
-            "Apa yang ingin dikerjakan?",
-            style: Theme.of(context).textTheme.headline2,
-          ),
+          headerForm("Apa yang ingin dikerjakan?"),
           FormTodo(
             hintText: "Mau Ngapain?",
             controller: controllerTask,
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
-
           // Form bagian mengisi tanggal
-          Text(
-            "Waktu dan Tanggal",
-            style: Theme.of(context).textTheme.headline2,
-          ),
+          headerForm("Waktu dan Tanggal"),
           Padding(padding: EdgeInsets.only(top: 10)),
           TextFormField(
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             controller: controllerTanggal,
+            readOnly: true,
             onTap: () async {
               final DateTime date = await showDatePicker(
+                  helpText: "Pilih tanggal",
                   context: context,
                   initialDate: tanggal,
                   firstDate: DateTime(2010), // batas awal tahun
                   lastDate: DateTime(2022)); // batas akhir tahun
               setState(() {
-                tanggal = date;
+                if (date != null) {
+                  tanggal = date;
+                }
               });
               controllerTanggal.text = formatTanggal.format(date);
             },
@@ -101,8 +119,7 @@ class _BodyInputState extends State<BodyInput> {
                   Icons.date_range_rounded,
                   color: Colors.tealAccent.shade100,
                 ),
-                hintText:
-                    formatTanggal.format(tanggal), // Menampilkan data saat ini
+                hintText: "Tanggal belum ditentukan",
                 hintStyle: Theme.of(context).textTheme.bodyText1,
                 contentPadding: EdgeInsets.only(bottom: 2),
                 isDense: true,
@@ -121,18 +138,13 @@ class _BodyInputState extends State<BodyInput> {
 }
 
 // ignore: must_be_immutable
-class FormTodo extends StatefulWidget {
+
+class FormTodo extends StatelessWidget {
   String hintText;
   TextEditingController controller;
   IconData icon;
 
   FormTodo({this.hintText, this.controller, this.icon});
-
-  @override
-  _FormTodoState createState() => _FormTodoState();
-}
-
-class _FormTodoState extends State<FormTodo> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   @override
@@ -142,14 +154,14 @@ class _FormTodoState extends State<FormTodo> {
       child: Form(
         key: _formkey,
         child: TextFormField(
-          controller: widget.controller,
+          controller: controller,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
               icon: Icon(
-                widget.icon,
+                icon,
                 color: Colors.tealAccent.shade100,
               ),
-              hintText: widget.hintText,
+              hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyText1,
               contentPadding: EdgeInsets.only(bottom: 2),
               isDense: true,
@@ -170,4 +182,18 @@ class _FormTodoState extends State<FormTodo> {
       ),
     );
   }
+}
+
+class AddToDo extends StatefulWidget {
+  bool isUpdate;
+  ToDo task;
+  AddToDo({this.isUpdate = false, this.task});
+
+  @override
+  _AddToDoState createState() => _AddToDoState();
+}
+
+class BodyInput extends StatefulWidget {
+  @override
+  _BodyInputState createState() => _BodyInputState();
 }
