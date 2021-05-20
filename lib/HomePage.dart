@@ -8,6 +8,8 @@ List<ToDo> tasks = [];
 
 /* Untuk merefresh database dan dimasukkan ke variable tasks */
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  bool value = false;
   @override
   void initState() {
     refresh();
@@ -17,11 +19,9 @@ class _HomePageState extends State<HomePage> {
   void refresh() async {
     List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
     tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-    print(tasks.length);
     for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].task}');
+      print('$i. ${tasks[i].isDone} ');
     }
-    print("SUDAH REFRESH");
 
     setState(() {});
   }
@@ -30,15 +30,86 @@ class _HomePageState extends State<HomePage> {
     if (item != null) {
       await DB.insert(ToDo.table, item);
       refresh();
+      _listKey.currentState.insertItem(tasks.length - 1);
+      setState(() {});
     }
   }
 
+  void _delete(ToDo item, int index) async {
+    var task = tasks.removeAt(index);
+    _listKey.currentState.removeItem(index, (context, animation) {
+      return FadeTransition(
+        opacity: animation,
+        child: _buildItem(task),
+      );
+    });
+    DB.delete(ToDo.table, item);
+    refresh();
+  }
+
+  Widget _buildItem(ToDo tasks, [int index]) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
+      decoration: BoxDecoration(
+          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
+      child: ListTile(
+        key: ValueKey<ToDo>(tasks),
+        leading: Icon(
+          Icons.tag_faces,
+          color: Colors.white,
+        ),
+        title: Text(
+          /* Menampilkan teks dari task */
+          '${tasks.task}',
+          style: Theme.of(context).textTheme.headline3,
+        ),
+        subtitle: Row(
+          children: [
+            /* Menampilkan teks tanggal */
+            Text('${tasks.tanggal}  -  ',
+                style: Theme.of(context).textTheme.headline4),
+            Text(
+              '${tasks.jam}',
+              style: Theme.of(context).textTheme.headline4,
+            )
+          ],
+        ),
+        trailing: Checkbox(
+          focusColor: Colors.green,
+          // side: BorderSide(color: Colors.teal.shade300),
+          value: tasks.isDone,
+          onChanged: (value) {
+            print(value);
+            if (value) {
+              _delete(tasks, index);
+            }
+            setState(() {});
+          },
+          activeColor: Colors.red,
+        ),
+      ),
+    );
+  }
+
+  // listView() {
+  //   return ListView.builder(
+  //       itemCount: tasks.length == null ? 0 : tasks.length,
+  //       itemBuilder: (context, index) {
+  //         return Items(index: index);
+  //       });
+  // }
+
   listView() {
-    return ListView.builder(
-        itemCount: tasks.length == null ? 0 : tasks.length,
-        itemBuilder: (context, index) {
-          return Items(index: index);
-        });
+    return AnimatedList(
+      key: _listKey,
+      initialItemCount: tasks.length,
+      itemBuilder: (context, index, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: _buildItem(tasks[index], index),
+        );
+      },
+    );
   }
 
   @override
@@ -52,7 +123,13 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           Icon(Icons.search),
-          IconButton(onPressed: () {}, icon: Icon(Icons.menu))
+          /* SEMENTARA AJA, BUAT NGETEST DATABASE */
+          IconButton(
+              onPressed: () async {
+                await DB.dropTable();
+                refresh();
+              },
+              icon: Icon(Icons.delete))
         ],
       ),
       /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
@@ -77,14 +154,26 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _ItemsState extends State<Items> {
+  _HomePageState _homePageState = _HomePageState();
+
   bool value = false;
+
+  Future<bool> confirm(DismissDirection direction) async {
+    if (value != false) {
+      return Future<bool>.value(true);
+    } else {
+      return Future<bool>.value(false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
       decoration: BoxDecoration(
-          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(5)),
+          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
       child: ListTile(
+        key: Key(tasks[widget.index].id.toString()),
         leading: Icon(
           Icons.tag_faces,
           color: Colors.white,
@@ -96,26 +185,20 @@ class _ItemsState extends State<Items> {
         ),
         subtitle: Row(
           children: [
-            Icon(
-              Icons.date_range_sharp,
-              size: 17.0,
-              color: Colors.white,
-            ),
             /* Menampilkan teks tanggal */
             Text('${tasks[widget.index].tanggal}',
                 style: Theme.of(context).textTheme.headline4),
           ],
         ),
-        onTap: () {
-          setState(() {
-            this.value = !value;
-          });
-        },
         trailing: Checkbox(
           focusColor: Colors.green,
           // side: BorderSide(color: Colors.teal.shade300),
           value: value,
           onChanged: (value) {
+            print(value);
+            if (value) {
+              _homePageState._delete(tasks[widget.index], widget.index);
+            }
             setState(() {
               this.value = value;
             });
@@ -132,9 +215,11 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+// ignore: must_be_immutable
 class Items extends StatefulWidget {
+  Animation<double> animation;
   int index;
-  Items({this.index});
+  Items({this.index, this.animation});
 
   @override
   _ItemsState createState() => _ItemsState();
