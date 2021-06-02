@@ -58,9 +58,9 @@ class _HomePageState extends State<HomePage> {
     List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
     tasks = _results.map((item) => ToDo.fromMap(item)).toList();
     for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].task} ');
+      print('$i. ${tasks[i].jam} ');
     }
-      print("Panjang Data ${tasks.length}");
+    print("Panjang Data ${tasks.length}");
 
     setState(() {});
   }
@@ -106,7 +106,9 @@ class _HomePageState extends State<HomePage> {
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
-      margin: index != this.tasks.length-1 ? EdgeInsets.fromLTRB(10, 10, 10, 5) : EdgeInsets.fromLTRB(10, 10, 10, 60),
+      margin: index != this.tasks.length - 1
+          ? EdgeInsets.fromLTRB(10, 10, 10, 5)
+          : EdgeInsets.fromLTRB(10, 10, 10, 60),
       decoration: BoxDecoration(
           color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
       child: ListTile(
@@ -117,13 +119,19 @@ class _HomePageState extends State<HomePage> {
             '${tasks.task}',
             style: Theme.of(context).textTheme.headline3,
           ),
-          subtitle: tasks.tanggal != "" ? Row(
-            children: [
-              /* Menampilkan teks tanggal */
-              Text('${tasks.tanggal}  -  ${tasks.jam}',
-                  style: Theme.of(context).textTheme.headline4),
-            ],
-          ) : null,
+          subtitle: tasks.tanggal != ""
+              ? Row(
+                  children: [
+                    /* Menampilkan teks tanggal */
+
+                    Text(
+                        tasks.jam != ""
+                            ? '${tasks.tanggal}  -  ${tasks.jam}'
+                            : '${tasks.tanggal}',
+                        style: Theme.of(context).textTheme.headline4),
+                  ],
+                )
+              : null,
           trailing: IconButton(
             onPressed: () {
               setState(() {

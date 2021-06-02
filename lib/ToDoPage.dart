@@ -5,6 +5,7 @@ import 'package:todo/model/Todo.dart';
 /* Controller for the todo and date */
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
+TextEditingController controllerJam = TextEditingController();
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -13,6 +14,7 @@ class _AddToDoState extends State<AddToDo> {
       print("InitTodo");
       controllerTask.text = widget.task.task;
       controllerTanggal.text = widget.task.tanggal;
+      controllerJam.text = widget.task.jam;
     }
   }
 
@@ -20,6 +22,7 @@ class _AddToDoState extends State<AddToDo> {
     // controllerTask.text = task.task;
     controllerTask.clear();
     controllerTanggal.clear();
+    controllerJam.clear();
   }
 
   @override
@@ -46,13 +49,13 @@ class _AddToDoState extends State<AddToDo> {
               ? ToDo(
                   task: controllerTask.text,
                   tanggal: controllerTanggal.text,
-                  jam: "09:30",
+                  jam: controllerJam.text,
                   isDone: false)
               : ToDo(
                   id: widget.task.id,
                   task: controllerTask.text,
                   tanggal: controllerTanggal.text,
-                  jam: "10:00",
+                  jam: controllerJam.text,
                   isDone: false);
           Navigator.pop(context, item);
           clearForm();
@@ -78,6 +81,32 @@ class _BodyInputState extends State<BodyInput> {
   final DateFormat formatTanggal =
       DateFormat('MMM dd, yyyy'); // Mengatur format
 
+  Future<void> showTanggal() async {
+    final DateTime date = await showDatePicker(
+        helpText: "Pilih tanggal",
+        context: context,
+        initialDate: tanggal,
+        firstDate: DateTime(2010), // batas awal tahun
+        lastDate: DateTime(2022)); // batas akhir tahun
+    setState(() {
+      if (date != null) {
+        tanggal = date;
+      }
+    });
+    controllerTanggal.text = formatTanggal.format(date);
+  }
+
+  Future<void> showJam() async {
+    final TimeOfDay result =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+
+    setState(() {
+      if (result != null) {
+        controllerJam.text = result.format(context);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -94,45 +123,69 @@ class _BodyInputState extends State<BodyInput> {
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           // Form bagian mengisi tanggal
-          headerForm("Waktu dan Tanggal"),
+          headerForm("Tanggal Kegiatan"),
           Padding(padding: EdgeInsets.only(top: 10)),
-          TextFormField(
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          MyTextForm(
+            onTap: showTanggal,
             controller: controllerTanggal,
-            readOnly: true,
-            onTap: () async {
-              final DateTime date = await showDatePicker(
-                  helpText: "Pilih tanggal",
-                  context: context,
-                  initialDate: tanggal,
-                  firstDate: DateTime(2010), // batas awal tahun
-                  lastDate: DateTime(2022)); // batas akhir tahun
-              setState(() {
-                if (date != null) {
-                  tanggal = date;
-                }
-              });
-              controllerTanggal.text = formatTanggal.format(date);
-            },
-            decoration: InputDecoration(
-                icon: Icon(
-                  Icons.date_range_rounded,
-                  color: Colors.tealAccent.shade100,
-                ),
-                hintText: "Tanggal belum ditentukan",
-                hintStyle: Theme.of(context).textTheme.bodyText1,
-                contentPadding: EdgeInsets.only(bottom: 2),
-                isDense: true,
-                filled: true,
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Theme.of(context).primaryColor, width: 2)),
-                focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Theme.of(context).primaryColor, width: 3))),
+            hintText: "Tanggal Belum Ditentukan",
           ),
+          Padding(padding: EdgeInsets.only(top: 20)),
+          controllerTanggal.text != ""
+              ? Column(
+                  // mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    headerForm("Waktu Kegiatan"),
+                    Padding(padding: EdgeInsets.only(top: 10)),
+                    MyTextForm(
+                      onTap: showJam,
+                      controller: controllerJam,
+                      hintText: "Jam Belum Ditentukan",
+                    ),
+                  ],
+                )
+              : Text(""),
         ],
       ),
+    );
+  }
+}
+
+class MyTextForm extends StatefulWidget {
+  void Function() onTap;
+  TextEditingController controller;
+  String hintText;
+
+  MyTextForm({this.onTap, this.controller, this.hintText});
+  @override
+  _TextFormState createState() => _TextFormState();
+}
+
+class _TextFormState extends State<MyTextForm> {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+      controller: widget.controller,
+      readOnly: true,
+      onTap: widget.onTap,
+      decoration: InputDecoration(
+          icon: Icon(
+            Icons.date_range_rounded,
+            color: Colors.tealAccent.shade100,
+          ),
+          hintText: widget.hintText,
+          hintStyle: Theme.of(context).textTheme.bodyText1,
+          contentPadding: EdgeInsets.only(bottom: 2),
+          isDense: true,
+          filled: true,
+          enabledBorder: UnderlineInputBorder(
+              borderSide:
+                  BorderSide(color: Theme.of(context).primaryColor, width: 2)),
+          focusedBorder: UnderlineInputBorder(
+              borderSide:
+                  BorderSide(color: Theme.of(context).primaryColor, width: 3))),
     );
   }
 }
