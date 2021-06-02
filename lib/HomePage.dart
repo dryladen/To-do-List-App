@@ -3,11 +3,8 @@ import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
 
-/* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
-
-/* Untuk merefresh database dan dimasukkan ke variable tasks */
-
 class _HomePageState extends State<HomePage> {
+/* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
   List<ToDo> tasks = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
   Color white = Colors.white;
@@ -29,7 +26,6 @@ class _HomePageState extends State<HomePage> {
           style: Theme.of(context).textTheme.headline1,
         ),
         actions: [
-          Icon(Icons.search),
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */
           IconButton(
               onPressed: () async {}, icon: Icon(Icons.more_vert_rounded))
@@ -61,8 +57,9 @@ class _HomePageState extends State<HomePage> {
     List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
     tasks = _results.map((item) => ToDo.fromMap(item)).toList();
     for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].task} ');
+      print('$i. ${tasks[i].jam} ');
     }
+    print("Panjang Data ${tasks.length}");
 
     setState(() {});
   }
@@ -107,7 +104,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
-      margin: EdgeInsets.fromLTRB(10, 10, 10, 5),
+      /* Menambah margin untuk list item paling terakhir */
+      margin: index != this.tasks.length - 1
+          ? EdgeInsets.fromLTRB(10, 10, 10, 5)
+          : EdgeInsets.fromLTRB(10, 10, 10, 60),
       decoration: BoxDecoration(
           color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
       child: ListTile(
@@ -118,13 +118,19 @@ class _HomePageState extends State<HomePage> {
             '${tasks.task}',
             style: Theme.of(context).textTheme.headline3,
           ),
-          subtitle: Row(
-            children: [
-              /* Menampilkan teks tanggal */
-              Text('${tasks.tanggal}  -  ${tasks.jam}',
-                  style: Theme.of(context).textTheme.headline4),
-            ],
-          ),
+          subtitle: tasks.tanggal != ""
+              ? Row(
+                  children: [
+                    /* Menampilkan teks tanggal */
+
+                    Text(
+                        tasks.jam != ""
+                            ? '${tasks.tanggal}  -  ${tasks.jam}'
+                            : '${tasks.tanggal}',
+                        style: Theme.of(context).textTheme.headline4),
+                  ],
+                )
+              : null,
           trailing: IconButton(
             onPressed: () {
               setState(() {
