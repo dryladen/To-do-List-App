@@ -25,6 +25,8 @@ class _AddToDoState extends State<AddToDo> {
     controllerJam.clear();
   }
 
+  final todoNull = SnackBar(content: Text("Kegiatan tidak boleh kosong"));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +34,7 @@ class _AddToDoState extends State<AddToDo> {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             Navigator.pop(context);
             clearForm();
           },
@@ -45,6 +48,10 @@ class _AddToDoState extends State<AddToDo> {
         onPressed: () {
           /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
           Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
+          if (controllerTask.text == ""){
+            ScaffoldMessenger.of(context).showSnackBar(todoNull);
+            return;
+          }
           ToDo item = widget.isUpdate != true
               ? ToDo(
                   task: controllerTask.text,
@@ -58,8 +65,8 @@ class _AddToDoState extends State<AddToDo> {
                   jam: controllerJam.text,
                   isDone: false);
           Navigator.pop(context, item);
-          clearForm();
-        },
+          clearForm();}
+        ,
         child: Icon(
           Icons.check,
         ),

@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
           style: Theme.of(context).textTheme.headline1,
         ),
         actions: [
-          Icon(Icons.search),
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */
           IconButton(
               onPressed: () async {}, icon: Icon(Icons.more_vert_rounded))
