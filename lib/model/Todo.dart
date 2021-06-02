@@ -21,7 +21,9 @@ class ToDo extends Model{
     return map;
   }
 
-  static ToDo fromMap(Map<String, dynamic> map) {
-    return ToDo(id: map['id'], task: map['task'], tanggal: map['tanggal'], jam: map['jam'], isDone: map['isDone'] == 1);
+  static ToDo fromMap(Map<dynamic, dynamic> map) {
+    print(map);
+    return ToDo(id: map['id'], task: map['task'].toString(), tanggal: map['tanggal'], jam: map['jam'], isDone: map['isDone'] == 1);
+    
   }
 }

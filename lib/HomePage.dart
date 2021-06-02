@@ -28,7 +28,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */
           IconButton(
-              onPressed: () async {}, icon: Icon(Icons.more_vert_rounded))
+              onPressed: () async {
+                // DB.dropTable();
+              },
+              icon: Icon(Icons.more_vert_rounded))
         ],
       ),
       /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
@@ -54,10 +57,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   void refresh() async {
-    List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
-    tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+    try {
+      List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
+      tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+    } catch (e) {
+      print(e);
+    }
     for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].jam} ');
+      print('$i. ${tasks[i].id} ');
     }
     print("Panjang Data ${tasks.length}");
 
