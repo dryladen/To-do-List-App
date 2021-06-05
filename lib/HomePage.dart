@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
@@ -83,12 +80,13 @@ class _HomePageState extends State<HomePage> {
     try {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
       tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-      DateTime.parse("${tasks[0].tanggal} 13:00:00");
+      for (var i = 0; i < tasks.length; i++) {
+        print("Tanggal ${tasks[i].dateTime}");
+      }
     } catch (e) {
       print(e);
     }
-    print(Timeline.now);
-
+    print("Jumlah Data: ${tasks.length}");
     setState(() {});
   }
 

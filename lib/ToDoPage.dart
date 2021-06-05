@@ -57,12 +57,14 @@ class _AddToDoState extends State<AddToDo> {
                   task: controllerTask.text,
                   tanggal: controllerTanggal.text,
                   jam: controllerJam.text,
+                  dateTime: DateTime.now(),
                   isDone: false)
               : ToDo(
                   id: widget.task.id,
                   task: controllerTask.text,
                   tanggal: controllerTanggal.text,
                   jam: controllerJam.text,
+                  dateTime: DateTime.now(),
                   isDone: false);
           Navigator.pop(context, item);
           clearForm();
