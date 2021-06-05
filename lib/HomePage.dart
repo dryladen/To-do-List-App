@@ -73,10 +73,11 @@ class _HomePageState extends State<HomePage> {
 
   void _save(ToDo item) async {
     if (item != null) {
+      
       await DB.insert(ToDo.table, item);
       refresh();
-      _listKey.currentState.insertItem(tasks.length - 1);
       setState(() {});
+      _listKey.currentState.insertItem(tasks.length-1);
     }
   }
 
