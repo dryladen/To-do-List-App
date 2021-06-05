@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
@@ -16,6 +19,20 @@ class _HomePageState extends State<HomePage> {
     print("InitState");
   }
 
+  void popMenuItemAction(String value) {
+    if (value == "About") {
+      showAboutDialog(
+          context: context,
+          applicationIcon: Image.asset(
+            "assets/img/ketua.png",
+            height: 50,
+          ),
+          applicationName: "ToDo List App",
+          applicationVersion: "1.0.0",
+          children: [Text("Ini adalah aplikasi untuk UAS Pemrograman Mobile")]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,11 +44,17 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */
-          IconButton(
-              onPressed: () async {
-                // DB.dropTable();
+          PopupMenuButton(
+              onSelected: (value) {
+                popMenuItemAction(value);
               },
-              icon: Icon(Icons.more_vert_rounded))
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text("About"),
+                      height: 10,
+                      value: "About",
+                    )
+                  ])
         ],
       ),
       /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
@@ -60,24 +83,21 @@ class _HomePageState extends State<HomePage> {
     try {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
       tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+      DateTime.parse("${tasks[0].tanggal} 13:00:00");
     } catch (e) {
       print(e);
     }
-    for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].id} ');
-    }
-    print("Panjang Data ${tasks.length}");
+    print(Timeline.now);
 
     setState(() {});
   }
 
   void _save(ToDo item) async {
     if (item != null) {
-      
       await DB.insert(ToDo.table, item);
       refresh();
       setState(() {});
-      _listKey.currentState.insertItem(tasks.length-1);
+      _listKey.currentState.insertItem(tasks.length - 1);
     }
   }
 
@@ -113,6 +133,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
+      
       margin: index != this.tasks.length - 1
           ? EdgeInsets.fromLTRB(10, 10, 10, 5)
           : EdgeInsets.fromLTRB(10, 10, 10, 60),

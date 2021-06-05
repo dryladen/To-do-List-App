@@ -11,10 +11,10 @@ class _AddToDoState extends State<AddToDo> {
   @override
   void initState() {
     if (widget.isUpdate != false) {
-      print("InitTodo");
       controllerTask.text = widget.task.task;
       controllerTanggal.text = widget.task.tanggal;
       controllerJam.text = widget.task.jam;
+      super.initState();
     }
   }
 
@@ -48,7 +48,7 @@ class _AddToDoState extends State<AddToDo> {
         onPressed: () {
           /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
           Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
-          if (controllerTask.text == ""){
+          if (controllerTask.text == "") {
             ScaffoldMessenger.of(context).showSnackBar(todoNull);
             return;
           }
@@ -65,8 +65,8 @@ class _AddToDoState extends State<AddToDo> {
                   jam: controllerJam.text,
                   isDone: false);
           Navigator.pop(context, item);
-          clearForm();}
-        ,
+          clearForm();
+        },
         child: Icon(
           Icons.check,
         ),
@@ -86,7 +86,7 @@ class _BodyInputState extends State<BodyInput> {
 
   DateTime tanggal = DateTime.now(); // Mengambil waktu saat ini
   final DateFormat formatTanggal =
-      DateFormat('MMM dd, yyyy'); // Mengatur format
+      DateFormat('y-MM-d'); // Mengatur format
 
   Future<void> showTanggal() async {
     final DateTime date = await showDatePicker(
@@ -104,8 +104,10 @@ class _BodyInputState extends State<BodyInput> {
   }
 
   Future<void> showJam() async {
-    final TimeOfDay result =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final TimeOfDay result = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        helpText: "Atur Waktu Kegiatan");
 
     setState(() {
       if (result != null) {
@@ -136,6 +138,7 @@ class _BodyInputState extends State<BodyInput> {
             onTap: showTanggal,
             controller: controllerTanggal,
             hintText: "Tanggal Belum Ditentukan",
+            iconData: Icons.date_range_rounded,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           controllerTanggal.text != ""
@@ -146,10 +149,10 @@ class _BodyInputState extends State<BodyInput> {
                     headerForm("Waktu Kegiatan"),
                     Padding(padding: EdgeInsets.only(top: 10)),
                     MyTextForm(
-                      onTap: showJam,
-                      controller: controllerJam,
-                      hintText: "Jam Belum Ditentukan",
-                    ),
+                        onTap: showJam,
+                        controller: controllerJam,
+                        hintText: "Jam Belum Ditentukan",
+                        iconData: Icons.access_time_outlined),
                   ],
                 )
               : Text(""),
@@ -159,12 +162,14 @@ class _BodyInputState extends State<BodyInput> {
   }
 }
 
+// ignore: must_be_immutable
 class MyTextForm extends StatefulWidget {
   void Function() onTap;
   TextEditingController controller;
   String hintText;
+  IconData iconData;
 
-  MyTextForm({this.onTap, this.controller, this.hintText});
+  MyTextForm({this.onTap, this.controller, this.hintText, this.iconData});
   @override
   _TextFormState createState() => _TextFormState();
 }
@@ -178,10 +183,7 @@ class _TextFormState extends State<MyTextForm> {
       readOnly: true,
       onTap: widget.onTap,
       decoration: InputDecoration(
-          icon: Icon(
-            Icons.date_range_rounded,
-            color: Colors.tealAccent.shade100,
-          ),
+          icon: Icon(widget.iconData,color: Colors.tealAccent.shade100,),
           hintText: widget.hintText,
           hintStyle: Theme.of(context).textTheme.bodyText1,
           contentPadding: EdgeInsets.only(bottom: 2),
@@ -198,7 +200,6 @@ class _TextFormState extends State<MyTextForm> {
 }
 
 // ignore: must_be_immutable
-
 class FormTodo extends StatelessWidget {
   String hintText;
   TextEditingController controller;
@@ -244,6 +245,7 @@ class FormTodo extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class AddToDo extends StatefulWidget {
   bool isUpdate;
   ToDo task;

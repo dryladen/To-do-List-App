@@ -7,12 +7,14 @@ class ToDo extends Model{
   String task;
   String tanggal;
   String jam;
+  DateTime dateTime;
   bool isDone;
 
 
-  ToDo({this.id, this.task, this.tanggal, this.jam, this.isDone});
+  ToDo({this.id, this.task, this.tanggal, this.jam, this.isDone, this.dateTime});
 
   Map<String, dynamic> toMap() {
+    
     Map<String, dynamic> map = {'task': task, 'tanggal': tanggal, 'jam': jam, 'isDone': isDone};
 
     if (id != null) {
