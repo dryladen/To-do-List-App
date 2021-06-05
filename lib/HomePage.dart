@@ -80,14 +80,31 @@ class _HomePageState extends State<HomePage> {
     try {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
       tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-      for (var i = 0; i < tasks.length; i++) {
-        print("Tanggal ${tasks[i].dateTime}");
-      }
+      tasks.sort((x,y) => x.dateTime.compareTo(y.dateTime));
+      sort();
+      // for (var i = 0; i < tasks.length; i++) {
+      //   print("Tanggal-${i+1} ${tasks[i].dateTime}");
+      // }
+
     } catch (e) {
       print(e);
     }
     print("Jumlah Data: ${tasks.length}");
     setState(() {});
+  }
+
+  sort() {
+    print("BELUM DISORTING");
+    for (var item in tasks) {
+      print(item.dateTime);
+    }
+    List<ToDo> baru = tasks;
+    baru.sort((x, y) => x.dateTime.compareTo(y.dateTime));
+
+    print("SUDAH DISORTINT");
+    for (var item in baru) {
+      print(item.dateTime);
+    }
   }
 
   void _save(ToDo item) async {
@@ -131,7 +148,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
-      
+
       margin: index != this.tasks.length - 1
           ? EdgeInsets.fromLTRB(10, 10, 10, 5)
           : EdgeInsets.fromLTRB(10, 10, 10, 60),

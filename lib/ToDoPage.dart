@@ -6,6 +6,7 @@ import 'package:todo/model/Todo.dart';
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 TextEditingController controllerJam = TextEditingController();
+DateTime dateTime;
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -23,6 +24,7 @@ class _AddToDoState extends State<AddToDo> {
     controllerTask.clear();
     controllerTanggal.clear();
     controllerJam.clear();
+    dateTime = DateTime(9000,0,0,0,0);
   }
 
   final todoNull = SnackBar(content: Text("Kegiatan tidak boleh kosong"));
@@ -57,14 +59,14 @@ class _AddToDoState extends State<AddToDo> {
                   task: controllerTask.text,
                   tanggal: controllerTanggal.text,
                   jam: controllerJam.text,
-                  dateTime: DateTime.now(),
+                  dateTime: dateTime,
                   isDone: false)
               : ToDo(
                   id: widget.task.id,
                   task: controllerTask.text,
                   tanggal: controllerTanggal.text,
                   jam: controllerJam.text,
-                  dateTime: DateTime.now(),
+                  dateTime: dateTime,
                   isDone: false);
           Navigator.pop(context, item);
           clearForm();
@@ -87,8 +89,7 @@ class _BodyInputState extends State<BodyInput> {
   }
 
   DateTime tanggal = DateTime.now(); // Mengambil waktu saat ini
-  final DateFormat formatTanggal =
-      DateFormat('y-MM-d'); // Mengatur format
+  final DateFormat formatTanggal = DateFormat('MMM d, y'); // Mengatur format
 
   Future<void> showTanggal() async {
     final DateTime date = await showDatePicker(
@@ -99,10 +100,10 @@ class _BodyInputState extends State<BodyInput> {
         lastDate: DateTime(2022)); // batas akhir tahun
     setState(() {
       if (date != null) {
-        tanggal = date;
+        controllerTanggal.text = formatTanggal.format(date);
+        dateTime = date;
       }
     });
-    controllerTanggal.text = formatTanggal.format(date);
   }
 
   Future<void> showJam() async {
@@ -185,7 +186,10 @@ class _TextFormState extends State<MyTextForm> {
       readOnly: true,
       onTap: widget.onTap,
       decoration: InputDecoration(
-          icon: Icon(widget.iconData,color: Colors.tealAccent.shade100,),
+          icon: Icon(
+            widget.iconData,
+            color: Colors.tealAccent.shade100,
+          ),
           hintText: widget.hintText,
           hintStyle: Theme.of(context).textTheme.bodyText1,
           contentPadding: EdgeInsets.only(bottom: 2),
