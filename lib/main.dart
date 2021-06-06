@@ -48,7 +48,11 @@ class MyApp extends StatelessWidget {
               headline4: TextStyle(
                   // Date Style
                   color: Colors.white,
-                  fontSize: 12)),
+                  fontSize: 13),
+              headline5: TextStyle(
+                  /* Date Stryle if passed */
+                  color: Colors.red.shade900,
+                  fontSize: 13)),
         ),
         home: HomePage());
   }

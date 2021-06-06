@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
@@ -9,11 +11,51 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
   Color white = Colors.white;
 
+  Timer timer;
+  int count = 0;
+
   @override
   void initState() {
     refresh();
     super.initState();
+    timer = Timer.periodic(
+        Duration(seconds: 60),
+        (timer) => refresh() 
+            );
     print("InitState");
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String subtitleText(ToDo task) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(
+        now.year, now.month, now.day, now.hour, now.minute, now.second);
+    final tommorow = DateTime(now.year, now.month, now.day + 1);
+
+    String text;
+    final dateCheck =
+        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
+    if (task.dateTime.isBefore(yesterday)) {
+      text = "Sudah Lewat";
+    } else if (dateCheck == today) {
+      text = "Hari ini";
+    } else if (dateCheck == tommorow) {
+      text = "Besok";
+    } else {
+      text = task.tanggal;
+    }
+
+    if (task.jam != "") {
+      text += " - ${task.jam}";
+    }
+
+    return text;
   }
 
   void popMenuItemAction(String value) {
@@ -80,17 +122,16 @@ class _HomePageState extends State<HomePage> {
     try {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
       tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-      sort();
-      tasks.sort((x,y) => x.dateTime.compareTo(y.dateTime));
-      // for (var i = 0; i < tasks.length; i++) {
-      //   print("Tanggal-${i+1} ${tasks[i].dateTime}");
-      // }
+      tasks.sort((x, y) => x.dateTime.compareTo(y.dateTime));
 
     } catch (e) {
       print(e);
     }
     print("Jumlah Data: ${tasks.length}");
-    setState(() {});
+    setState(() {
+      count++;
+    });
+    print("Count: $count");
   }
 
   sort() {
@@ -101,7 +142,7 @@ class _HomePageState extends State<HomePage> {
     List<ToDo> baru = tasks;
     baru.sort((x, y) => x.dateTime.compareTo(y.dateTime));
 
-    print("SUDAH DISORTINT");
+    print("SUDAH DISORTING");
     for (var item in baru) {
       print(item.dateTime);
     }
@@ -166,12 +207,10 @@ class _HomePageState extends State<HomePage> {
               ? Row(
                   children: [
                     /* Menampilkan teks tanggal */
-
-                    Text(
-                        tasks.jam != ""
-                            ? '${tasks.tanggal}  -  ${tasks.jam}'
-                            : '${tasks.tanggal}',
-                        style: Theme.of(context).textTheme.headline4),
+                    Text(subtitleText(tasks),
+                        style: subtitleText(tasks).contains("Sudah Lewat")
+                            ? Theme.of(context).textTheme.headline5
+                            : Theme.of(context).textTheme.headline4),
                   ],
                 )
               : null,

@@ -6,9 +6,10 @@ import 'package:todo/model/Todo.dart';
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 TextEditingController controllerJam = TextEditingController();
-DateTime dateTime = DateTime(9000); 
-String jam24 = "23:59:00"; 
+DateTime dateTime = DateTime(9000);
+String jam24 = "23:59:59";
 String yMMd = "9000-01-01";
+bool isUpdating = false;
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -17,6 +18,8 @@ class _AddToDoState extends State<AddToDo> {
       controllerTask.text = widget.task.task;
       controllerTanggal.text = widget.task.tanggal;
       controllerJam.text = widget.task.jam;
+      isUpdating = widget.isUpdate;
+      dateTime = widget.task.dateTime;
       super.initState();
     }
   }
@@ -30,8 +33,9 @@ class _AddToDoState extends State<AddToDo> {
     The DateTime set to 9000 cuz it will more bigger then current year.
     */
     dateTime = DateTime(9000);
-    jam24 = "23:59:00";
+    jam24 = "23:59:59";
     yMMd = "9000-01-01";
+    isUpdating = false;
   }
 
   final todoNull = SnackBar(content: Text("Kegiatan tidak boleh kosong"));
@@ -43,7 +47,7 @@ class _AddToDoState extends State<AddToDo> {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
             Navigator.pop(context);
             clearForm();
           },
@@ -58,10 +62,10 @@ class _AddToDoState extends State<AddToDo> {
           /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
           Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
           if (controllerTask.text == "") {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(todoNull);
             return;
           }
-          print("Fix Waktu: $dateTime");
           ToDo item = widget.isUpdate != true
               ? ToDo(
                   task: controllerTask.text,
@@ -96,25 +100,24 @@ class _BodyInputState extends State<BodyInput> {
     );
   }
 
-  DateTime tanggal = DateTime.now(); // Mengambil waktu saat ini
+  DateTime dateTimeNow = DateTime.now();
   final DateFormat formatTanggal = DateFormat('MMM d, y'); // Mengatur format
 
   Future<void> showTanggal() async {
     final DateTime date = await showDatePicker(
         helpText: "Pilih tanggal",
         context: context,
-        initialDate: tanggal,
+        initialDate: isUpdating != false ? dateTime : dateTimeNow,
         firstDate: DateTime(2020), // batas awal tahun
-        lastDate: DateTime(2023)); // batas akhir tahun
+        lastDate: DateTime(9000)); // batas akhir tahun
     setState(() {
       if (date != null) {
         /* Show to interface */
         controllerTanggal.text = formatTanggal.format(date); /* Jun 23, 2023 */
-        
+        print(date);
         /* For comparing */
-        yMMd = DateFormat("y-MM-d").format(date);
+        yMMd = DateFormat("y-MM-dd").format(date);
         dateTime = DateTime.parse("$yMMd $jam24");
-        print("Tanggal $dateTime");
       }
     });
   }
@@ -122,21 +125,22 @@ class _BodyInputState extends State<BodyInput> {
   Future<void> showJam() async {
     final TimeOfDay result = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.now(),
+        initialTime: isUpdating != true
+            ? TimeOfDay.now()
+            : TimeOfDay.fromDateTime(dateTime),
         helpText: "Atur Waktu Kegiatan");
 
     setState(() {
       if (result != null) {
         var jamFormat = result.toString(); /* TimeOfDay(10:00) */
-        
+
         /* Use regex to get the time inside parentheses */
         var listJam = jamFormat.split(RegExp(r"[\(+\)]")); /* 10:00 */
 
-        jam24 = listJam[1]+ ":00" ;
+        jam24 = listJam[1] + ":00";
 
         dateTime = DateTime.parse("$yMMd $jam24");
-        print("Waktu $dateTime");
-        
+
         controllerJam.text = result.format(context);
       }
     });
@@ -187,19 +191,7 @@ class _BodyInputState extends State<BodyInput> {
     );
   }
 }
-
-// ignore: must_be_immutable
-class MyTextForm extends StatefulWidget {
-  void Function() onTap;
-  TextEditingController controller;
-  String hintText;
-  IconData iconData;
-
-  MyTextForm({this.onTap, this.controller, this.hintText, this.iconData});
-  @override
-  _TextFormState createState() => _TextFormState();
-}
-
+/* Class for date form and time form (The second and the third one) */
 class _TextFormState extends State<MyTextForm> {
   @override
   Widget build(BuildContext context) {
@@ -228,7 +220,8 @@ class _TextFormState extends State<MyTextForm> {
   }
 }
 
-// ignore: must_be_immutable
+/* Class of Form Task (The first one) */
+
 class FormTodo extends StatelessWidget {
   String hintText;
   TextEditingController controller;
@@ -287,4 +280,16 @@ class AddToDo extends StatefulWidget {
 class BodyInput extends StatefulWidget {
   @override
   _BodyInputState createState() => _BodyInputState();
+}
+
+// ignore: must_be_immutable
+class MyTextForm extends StatefulWidget {
+  void Function() onTap;
+  TextEditingController controller;
+  String hintText;
+  IconData iconData;
+
+  MyTextForm({this.onTap, this.controller, this.hintText, this.iconData});
+  @override
+  _TextFormState createState() => _TextFormState();
 }
