@@ -114,7 +114,6 @@ class _BodyInputState extends State<BodyInput> {
       if (date != null) {
         /* Show to interface */
         controllerTanggal.text = formatTanggal.format(date); /* Jun 23, 2023 */
-        print(date);
         /* For comparing */
         yMMd = DateFormat("y-MM-dd").format(date);
         dateTime = DateTime.parse("$yMMd $jam24");
@@ -191,6 +190,7 @@ class _BodyInputState extends State<BodyInput> {
     );
   }
 }
+
 /* Class for date form and time form (The second and the third one) */
 class _TextFormState extends State<MyTextForm> {
   @override

@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
                   // Date Style
                   color: Colors.white,
                   fontSize: 13),
-              headline5: TextStyle(
+              headline6: TextStyle(
                   /* Date Stryle if passed */
                   color: Colors.red.shade900,
                   fontSize: 13)),

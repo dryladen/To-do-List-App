@@ -13,15 +13,25 @@ class _HomePageState extends State<HomePage> {
 
   Timer timer;
   int count = 0;
+  bool isHeading = false;
+  String savedHeading = " ";
+  final today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final yesterday = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+      DateTime.now().hour,
+      DateTime.now().minute,
+      DateTime.now().second);
+  final tommorow = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
 
   @override
   void initState() {
     refresh();
     super.initState();
-    timer = Timer.periodic(
-        Duration(seconds: 60),
-        (timer) => refresh() 
-            );
+    // timer = Timer.periodic(Duration(seconds: 60), (timer) => refresh());
     print("InitState");
   }
 
@@ -32,12 +42,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   String subtitleText(ToDo task) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = DateTime(
-        now.year, now.month, now.day, now.hour, now.minute, now.second);
-    final tommorow = DateTime(now.year, now.month, now.day + 1);
-
     String text;
     final dateCheck =
         DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
@@ -58,6 +62,31 @@ class _HomePageState extends State<HomePage> {
     return text;
   }
 
+  String headingTask(ToDo task, [int index]) {
+    dynamic kembalian;
+    String text;
+
+    final dateCheck =
+        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
+    if (task.dateTime.isBefore(yesterday)) {
+      text = "Sudah Lewat";
+    } else if (dateCheck == today) {
+      text = "Hari ini";
+    } else if (dateCheck == tommorow) {
+      text = "Besok";
+    } else if (dateCheck == DateTime(9000, 1, 1)) {
+      text = "Tidak Ada Tanggal";
+    } else {
+      text = "Nanti";
+    }
+
+    if (isHeading != true) {
+      isHeading = true;
+    }
+    savedHeading = text;
+    return text;
+  }
+
   void popMenuItemAction(String value) {
     if (value == "About") {
       showAboutDialog(
@@ -67,8 +96,14 @@ class _HomePageState extends State<HomePage> {
             height: 50,
           ),
           applicationName: "ToDo List App",
-          applicationVersion: "1.0.0",
-          children: [Text("Ini adalah aplikasi untuk UAS Pemrograman Mobile")]);
+          applicationVersion: "1.0.1",
+
+          children: [
+            Center(child: Text("Kelompok 6 - Oozma Kappa")),
+            Text("1915016069 - Delfan Rynaldo Laden"),
+            Text("1915016074 - Oktavian Yoga"),
+            Text("1915016093 - Muhammad Irvansyah")
+          ]);
     }
   }
 
@@ -123,29 +158,10 @@ class _HomePageState extends State<HomePage> {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
       tasks = _results.map((item) => ToDo.fromMap(item)).toList();
       tasks.sort((x, y) => x.dateTime.compareTo(y.dateTime));
-
     } catch (e) {
       print(e);
     }
-    print("Jumlah Data: ${tasks.length}");
-    setState(() {
-      count++;
-    });
-    print("Count: $count");
-  }
-
-  sort() {
-    print("BELUM DISORTING");
-    for (var item in tasks) {
-      print(item.dateTime);
-    }
-    List<ToDo> baru = tasks;
-    baru.sort((x, y) => x.dateTime.compareTo(y.dateTime));
-
-    print("SUDAH DISORTING");
-    for (var item in baru) {
-      print(item.dateTime);
-    }
+    setState(() {});
   }
 
   void _save(ToDo item) async {
@@ -186,6 +202,7 @@ class _HomePageState extends State<HomePage> {
     refresh();
   }
 
+  /* List of todo */
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
@@ -201,7 +218,12 @@ class _HomePageState extends State<HomePage> {
           title: Text(
             /* Menampilkan teks dari task */
             '${tasks.task}',
-            style: Theme.of(context).textTheme.headline3,
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: subtitleText(tasks).contains("Sudah Lewat")
+                    ? Colors.red.shade800
+                    : Colors.white),
           ),
           subtitle: tasks.tanggal != ""
               ? Row(
@@ -209,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                     /* Menampilkan teks tanggal */
                     Text(subtitleText(tasks),
                         style: subtitleText(tasks).contains("Sudah Lewat")
-                            ? Theme.of(context).textTheme.headline5
+                            ? Theme.of(context).textTheme.headline6
                             : Theme.of(context).textTheme.headline4),
                   ],
                 )
@@ -234,6 +256,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /* Generate the listview of Heading Text and   */
   listView() {
     return AnimatedList(
       key: _listKey,
@@ -241,7 +264,30 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (context, index, animation) {
         return FadeTransition(
           opacity: animation,
-          child: _buildItem(tasks[index], index),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              savedHeading != headingTask(tasks[index], index)
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 20),
+                      child: Text(
+                        savedHeading,
+                        style: TextStyle(
+                            color: savedHeading == "Sudah Lewat"
+                                ? Colors.red
+                                : Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900),
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.only(
+                          top: savedHeading != headingTask(tasks[index])
+                              ? 50
+                              : 0)),
+              _buildItem(tasks[index], index)
+            ],
+          ),
         );
       },
     );
