@@ -80,8 +80,8 @@ class _HomePageState extends State<HomePage> {
     try {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
       tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-      tasks.sort((x,y) => x.dateTime.compareTo(y.dateTime));
       sort();
+      tasks.sort((x,y) => x.dateTime.compareTo(y.dateTime));
       // for (var i = 0; i < tasks.length; i++) {
       //   print("Tanggal-${i+1} ${tasks[i].dateTime}");
       // }

@@ -15,7 +15,7 @@ class ToDo extends Model {
       {this.id, this.task, this.tanggal, this.jam, this.isDone, this.dateTime});
 
   Map<String, dynamic> toMap() {
-    String datetime = DateFormat("y-MM-d").format(this.dateTime);
+    String datetime = DateFormat("y-MM-d H:m:s").format(this.dateTime);
     print(datetime);
     Map<String, dynamic> map = {
       'task': task,
@@ -32,7 +32,7 @@ class ToDo extends Model {
   }
 
   static ToDo fromMap(Map<dynamic, dynamic> map) {
-    DateTime datetime = DateFormat("y-MM-d").parse(map['dateTime']);
+    DateTime datetime = DateFormat("y-MM-d H:m:s").parse(map['dateTime']);
     return ToDo(
         id: map['id'],
         task: map['task'].toString(),

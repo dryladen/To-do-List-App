@@ -6,7 +6,9 @@ import 'package:todo/model/Todo.dart';
 TextEditingController controllerTask = TextEditingController();
 TextEditingController controllerTanggal = TextEditingController();
 TextEditingController controllerJam = TextEditingController();
-DateTime dateTime;
+DateTime dateTime = DateTime(9000); 
+String jam24 = "23:59:00"; 
+String yMMd = "9000-01-01";
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -24,7 +26,12 @@ class _AddToDoState extends State<AddToDo> {
     controllerTask.clear();
     controllerTanggal.clear();
     controllerJam.clear();
-    dateTime = DateTime(9000,0,0,0,0);
+    /* Cuz list of itme will be sorted, so for the list that did have date, will be go to the bottom 
+    The DateTime set to 9000 cuz it will more bigger then current year.
+    */
+    dateTime = DateTime(9000);
+    jam24 = "23:59:00";
+    yMMd = "9000-01-01";
   }
 
   final todoNull = SnackBar(content: Text("Kegiatan tidak boleh kosong"));
@@ -42,7 +49,7 @@ class _AddToDoState extends State<AddToDo> {
           },
         ),
         title: Text(
-          "Tugas Baru",
+          widget.isUpdate != true ? "Tugas Baru" : "Update Kegiatan",
           style: Theme.of(context).textTheme.headline1,
         ),
       ),
@@ -54,6 +61,7 @@ class _AddToDoState extends State<AddToDo> {
             ScaffoldMessenger.of(context).showSnackBar(todoNull);
             return;
           }
+          print("Fix Waktu: $dateTime");
           ToDo item = widget.isUpdate != true
               ? ToDo(
                   task: controllerTask.text,
@@ -96,12 +104,17 @@ class _BodyInputState extends State<BodyInput> {
         helpText: "Pilih tanggal",
         context: context,
         initialDate: tanggal,
-        firstDate: DateTime(2010), // batas awal tahun
-        lastDate: DateTime(2022)); // batas akhir tahun
+        firstDate: DateTime(2020), // batas awal tahun
+        lastDate: DateTime(2023)); // batas akhir tahun
     setState(() {
       if (date != null) {
-        controllerTanggal.text = formatTanggal.format(date);
-        dateTime = date;
+        /* Show to interface */
+        controllerTanggal.text = formatTanggal.format(date); /* Jun 23, 2023 */
+        
+        /* For comparing */
+        yMMd = DateFormat("y-MM-d").format(date);
+        dateTime = DateTime.parse("$yMMd $jam24");
+        print("Tanggal $dateTime");
       }
     });
   }
@@ -114,6 +127,16 @@ class _BodyInputState extends State<BodyInput> {
 
     setState(() {
       if (result != null) {
+        var jamFormat = result.toString(); /* TimeOfDay(10:00) */
+        
+        /* Use regex to get the time inside parentheses */
+        var listJam = jamFormat.split(RegExp(r"[\(+\)]")); /* 10:00 */
+
+        jam24 = listJam[1]+ ":00" ;
+
+        dateTime = DateTime.parse("$yMMd $jam24");
+        print("Waktu $dateTime");
+        
         controllerJam.text = result.format(context);
       }
     });
