@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
@@ -9,11 +11,65 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
   Color white = Colors.white;
 
+  Timer timer;
+  int count = 0;
+
   @override
   void initState() {
     refresh();
     super.initState();
+    timer = Timer.periodic(
+        Duration(seconds: 60),
+        (timer) => refresh() 
+            );
     print("InitState");
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String subtitleText(ToDo task) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(
+        now.year, now.month, now.day, now.hour, now.minute, now.second);
+    final tommorow = DateTime(now.year, now.month, now.day + 1);
+
+    String text;
+    final dateCheck =
+        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
+    if (task.dateTime.isBefore(yesterday)) {
+      text = "Sudah Lewat";
+    } else if (dateCheck == today) {
+      text = "Hari ini";
+    } else if (dateCheck == tommorow) {
+      text = "Besok";
+    } else {
+      text = task.tanggal;
+    }
+
+    if (task.jam != "") {
+      text += " - ${task.jam}";
+    }
+
+    return text;
+  }
+
+  void popMenuItemAction(String value) {
+    if (value == "About") {
+      showAboutDialog(
+          context: context,
+          applicationIcon: Image.asset(
+            "assets/img/ketua.png",
+            height: 50,
+          ),
+          applicationName: "ToDo List App",
+          applicationVersion: "1.0.0",
+          children: [Text("Ini adalah aplikasi untuk UAS Pemrograman Mobile")]);
+    }
   }
 
   @override
@@ -27,8 +83,17 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */
-          IconButton(
-              onPressed: () async {}, icon: Icon(Icons.more_vert_rounded))
+          PopupMenuButton(
+              onSelected: (value) {
+                popMenuItemAction(value);
+              },
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text("About"),
+                      height: 10,
+                      value: "About",
+                    )
+                  ])
         ],
       ),
       /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
@@ -54,22 +119,41 @@ class _HomePageState extends State<HomePage> {
   }
 
   void refresh() async {
-    List<Map<String, dynamic>> _results = await DB.query(ToDo.table);
-    tasks = _results.map((item) => ToDo.fromMap(item)).toList();
-    for (int i = 0; i < tasks.length; i++) {
-      print('$i. ${tasks[i].jam} ');
-    }
-    print("Panjang Data ${tasks.length}");
+    try {
+      List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
+      tasks = _results.map((item) => ToDo.fromMap(item)).toList();
+      tasks.sort((x, y) => x.dateTime.compareTo(y.dateTime));
 
-    setState(() {});
+    } catch (e) {
+      print(e);
+    }
+    print("Jumlah Data: ${tasks.length}");
+    setState(() {
+      count++;
+    });
+    print("Count: $count");
+  }
+
+  sort() {
+    print("BELUM DISORTING");
+    for (var item in tasks) {
+      print(item.dateTime);
+    }
+    List<ToDo> baru = tasks;
+    baru.sort((x, y) => x.dateTime.compareTo(y.dateTime));
+
+    print("SUDAH DISORTING");
+    for (var item in baru) {
+      print(item.dateTime);
+    }
   }
 
   void _save(ToDo item) async {
     if (item != null) {
       await DB.insert(ToDo.table, item);
       refresh();
-      _listKey.currentState.insertItem(tasks.length - 1);
       setState(() {});
+      _listKey.currentState.insertItem(tasks.length - 1);
     }
   }
 
@@ -105,6 +189,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
+
       margin: index != this.tasks.length - 1
           ? EdgeInsets.fromLTRB(10, 10, 10, 5)
           : EdgeInsets.fromLTRB(10, 10, 10, 60),
@@ -122,12 +207,10 @@ class _HomePageState extends State<HomePage> {
               ? Row(
                   children: [
                     /* Menampilkan teks tanggal */
-
-                    Text(
-                        tasks.jam != ""
-                            ? '${tasks.tanggal}  -  ${tasks.jam}'
-                            : '${tasks.tanggal}',
-                        style: Theme.of(context).textTheme.headline4),
+                    Text(subtitleText(tasks),
+                        style: subtitleText(tasks).contains("Sudah Lewat")
+                            ? Theme.of(context).textTheme.headline5
+                            : Theme.of(context).textTheme.headline4),
                   ],
                 )
               : null,

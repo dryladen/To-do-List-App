@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:todo/model/Todo.dart';
 import 'package:todo/model/model.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class DB {
   static Database _db;
+
+  
 
   static int get _version => 1;
 
@@ -13,9 +18,9 @@ abstract class DB {
       return;
     }
     try {
-      String _path = await getDatabasesPath();
-      print('PATH : $_path');
-      _db = await openDatabase(join(await getDatabasesPath(), 'todoTable.db'),
+      Directory _path = await getApplicationDocumentsDirectory();
+      print('PATH : $_path.');
+      _db = await openDatabase(join(_path.path, 'TodoDatabase.db'),
           version: _version, onCreate: onCreate);
       print('DB: $_db');
       print("SUDAH");
@@ -29,10 +34,11 @@ abstract class DB {
       return;
     }
     try {
-      String _path = await getDatabasesPath();
+      Directory _path = await getApplicationDocumentsDirectory();
+      print(_path.path);
       _db = await openDatabase(join(await getDatabasesPath(), 'todoTable.db'),
           version: _version);
-          onDrop(_db, _version);
+      onDrop(_db, _version);
       print("Sudah dihapus");
     } catch (ex) {
       print('Error: ' + ex);
@@ -40,12 +46,12 @@ abstract class DB {
   }
 
   static void onDrop(Database db, int version) async =>
-      await db.execute('DROP TABLE IF EXISTS todotable');
+      await db.execute('DROP TABLE IF EXISTS todoTable');
 
   static void onCreate(Database db, int version) async => await db.execute(
-      'CREATE TABLE todoTable (id INTEGER PRIMARY KEY NOT NULL, task STRING, tanggal STRING, jam STRING, isDone INTEGER NOT NULL)');
+      'CREATE TABLE ${ToDo.table} (id INTEGER PRIMARY KEY NOT NULL, task STRING, tanggal STRING, jam STRING, dateTime STRING, isDone INTEGER NOT NULL)');
 
-  static Future<List<Map<String, dynamic>>> query(String table) async =>
+  static Future<List<Map<dynamic, dynamic>>> query(String table) async =>
       _db.query(table);
 
   static Future<int> insert(String table, Model model) async =>
