@@ -97,7 +97,13 @@ class _HomePageState extends State<HomePage> {
           ),
           applicationName: "ToDo List App",
           applicationVersion: "1.0.1",
-          children: [Text("Ini adalah aplikasi untuk UAS Pemrograman Mobile")]);
+
+          children: [
+            Center(child: Text("Kelompok 6 - Oozma Kappa")),
+            Text("1915016069 - Delfan Rynaldo Laden"),
+            Text("1915016074 - Oktavian Yoga"),
+            Text("1915016093 - Muhammad Irvansyah")
+          ]);
     }
   }
 
