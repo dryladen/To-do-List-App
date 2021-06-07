@@ -10,6 +10,7 @@ DateTime dateTime = DateTime(9000);
 String jam24 = "23:59:59";
 String yMMd = "9000-01-01";
 bool isUpdating = false;
+bool isYesterday = false;
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -20,6 +21,7 @@ class _AddToDoState extends State<AddToDo> {
       controllerJam.text = widget.task.jam;
       isUpdating = widget.isUpdate;
       dateTime = widget.task.dateTime;
+      yMMd = DateFormat("y-MM-dd").format(widget.task.dateTime);
       super.initState();
     }
   }
@@ -196,7 +198,11 @@ class _TextFormState extends State<MyTextForm> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+      style: TextStyle(
+          color: dateTime.isBefore(DateTime.now())
+              ? Colors.red
+              : Colors.white,
+          fontWeight: FontWeight.w600),
       controller: widget.controller,
       readOnly: true,
       onTap: widget.onTap,
@@ -222,6 +228,7 @@ class _TextFormState extends State<MyTextForm> {
 
 /* Class of Form Task (The first one) */
 
+// ignore: must_be_immutable
 class FormTodo extends StatelessWidget {
   String hintText;
   TextEditingController controller;
