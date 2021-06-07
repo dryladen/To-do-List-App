@@ -63,7 +63,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   String headingTask(ToDo task, [int index]) {
-    dynamic kembalian;
     String text;
 
     final dateCheck =
@@ -96,8 +95,7 @@ class _HomePageState extends State<HomePage> {
             height: 50,
           ),
           applicationName: "ToDo List App",
-          applicationVersion: "1.0.1",
-
+          applicationVersion: "1.0.2",
           children: [
             Center(child: Text("Kelompok 6 - Oozma Kappa")),
             Text("1915016069 - Delfan Rynaldo Laden"),
@@ -218,12 +216,7 @@ class _HomePageState extends State<HomePage> {
           title: Text(
             /* Menampilkan teks dari task */
             '${tasks.task}',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: subtitleText(tasks).contains("Sudah Lewat")
-                    ? Colors.red.shade800
-                    : Colors.white),
+            style: Theme.of(context).textTheme.headline3,
           ),
           subtitle: tasks.tanggal != ""
               ? Row(
