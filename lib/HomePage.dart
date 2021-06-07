@@ -9,6 +9,7 @@ class _HomePageState extends State<HomePage> {
 /* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
   List<ToDo> tasks = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey();
   Color white = Colors.white;
 
   Timer timer;
@@ -31,78 +32,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     refresh();
     super.initState();
-    // timer = Timer.periodic(Duration(seconds: 60), (timer) => refresh());
     print("InitState");
   }
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
-  }
-
-  String subtitleText(ToDo task) {
-    String text;
-    final dateCheck =
-        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
-    if (task.dateTime.isBefore(yesterday)) {
-      text = "Sudah Lewat";
-    } else if (dateCheck == today) {
-      text = "Hari ini";
-    } else if (dateCheck == tommorow) {
-      text = "Besok";
-    } else {
-      text = task.tanggal;
-    }
-
-    if (task.jam != "") {
-      text += " - ${task.jam}";
-    }
-
-    return text;
-  }
-
-  String headingTask(ToDo task, [int index]) {
-    String text;
-
-    final dateCheck =
-        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
-    if (task.dateTime.isBefore(yesterday)) {
-      text = "Sudah Lewat";
-    } else if (dateCheck == today) {
-      text = "Hari ini";
-    } else if (dateCheck == tommorow) {
-      text = "Besok";
-    } else if (dateCheck == DateTime(9000, 1, 1)) {
-      text = "Tidak Ada Tanggal";
-    } else {
-      text = "Nanti";
-    }
-
-    if (isHeading != true) {
-      isHeading = true;
-    }
-    savedHeading = text;
-    return text;
-  }
-
-  void popMenuItemAction(String value) {
-    if (value == "About") {
-      showAboutDialog(
-          context: context,
-          applicationIcon: Image.asset(
-            "assets/img/ketua.png",
-            height: 50,
-          ),
-          applicationName: "ToDo List App",
-          applicationVersion: "1.0.2",
-          children: [
-            Center(child: Text("Kelompok 6 - Oozma Kappa")),
-            Text("1915016069 - Delfan Rynaldo Laden"),
-            Text("1915016074 - Oktavian Yoga"),
-            Text("1915016093 - Muhammad Irvansyah")
-          ]);
-    }
   }
 
   @override
@@ -136,7 +71,18 @@ class _HomePageState extends State<HomePage> {
               'assets/img/Koala.png',
               height: 90,
             ))
-          : listView(),
+          : RefreshIndicator(
+              key: _refreshKey,
+              child: listView(),
+              onRefresh: () async {
+                _refreshKey.currentState.show(
+                  atTop: true,
+                );
+                await Future.delayed(Duration(seconds: 2));
+                setState(() {});
+                // listView();
+                print("Refresh");
+              }),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
@@ -149,6 +95,70 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  String subtitleText(ToDo task) {
+    String text;
+    final dateCheck =
+        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
+    if (task.dateTime.isBefore(DateTime.now())) {
+      text = "Sudah Lewat, ${task.tanggal}";
+    } else if (dateCheck == today) {
+      text = "Hari ini";
+    } else if (dateCheck == tommorow) {
+      text = "Besok";
+    } else {
+      text = task.tanggal;
+    }
+
+    if (task.jam != "") {
+      text += " - ${task.jam}";
+    }
+
+    return text;
+  }
+
+  String headingTask(ToDo task, [int index]) {
+    String text;
+    final dateCheck =
+        DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
+    if (task.dateTime.isBefore(DateTime.now())) {
+      text = "Sudah Lewat";
+    } else if (dateCheck == today) {
+      text = "Hari ini";
+    } else if (dateCheck == tommorow) {
+      text = "Besok";
+    } else if (dateCheck == DateTime(9000, 1, 1)) {
+      text = "Tidak Ada Tanggal";
+    } else {
+      text = "Nanti";
+    }
+
+    savedHeading = text;
+
+    if (index == tasks.length - 1) {
+      savedHeading = " ";
+    }
+    return text;
+  }
+
+  void popMenuItemAction(String value) {
+    if (value == "About") {
+      showAboutDialog(
+          context: context,
+          applicationIcon: Image.asset(
+            "assets/img/ketua.png",
+            height: 50,
+          ),
+          applicationName: "ToDo List App",
+          applicationVersion: "1.0.2",
+          children: [
+            Center(child: Text("Kelompok 6 - Oozma Kappa")),
+            Text("1915016069 - Delfan Rynaldo Laden"),
+            Text("1915016074 - Oktavian Yoga"),
+            Text("1915016093 - Muhammad Irvansyah")
+          ]);
+    }
   }
 
   void refresh() async {
@@ -164,6 +174,7 @@ class _HomePageState extends State<HomePage> {
 
   void _save(ToDo item) async {
     if (item != null) {
+      print("Tidak Null");
       await DB.insert(ToDo.table, item);
       refresh();
       setState(() {});
@@ -252,6 +263,7 @@ class _HomePageState extends State<HomePage> {
   /* Generate the listview of Heading Text and   */
   listView() {
     return AnimatedList(
+      physics: const AlwaysScrollableScrollPhysics(),
       key: _listKey,
       initialItemCount: tasks.length,
       itemBuilder: (context, index, animation) {
@@ -264,20 +276,17 @@ class _HomePageState extends State<HomePage> {
                   ? Padding(
                       padding: const EdgeInsets.only(left: 15, top: 20),
                       child: Text(
-                        savedHeading,
+                        headingTask(tasks[index], index),
                         style: TextStyle(
-                            color: savedHeading == "Sudah Lewat"
+                            color: headingTask(tasks[index], index) ==
+                                    "Sudah Lewat"
                                 ? Colors.red
                                 : Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.w900),
                       ),
                     )
-                  : Padding(
-                      padding: EdgeInsets.only(
-                          top: savedHeading != headingTask(tasks[index])
-                              ? 50
-                              : 0)),
+                  : Padding(padding: EdgeInsets.only(top: 0)),
               _buildItem(tasks[index], index)
             ],
           ),
