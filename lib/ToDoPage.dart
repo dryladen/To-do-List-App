@@ -10,7 +10,6 @@ DateTime dateTime = DateTime(9000);
 String jam24 = "23:59:59";
 String yMMd = "9000-01-01";
 bool isUpdating = false;
-bool isYesterday = false;
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -27,6 +26,7 @@ class _AddToDoState extends State<AddToDo> {
   }
 
   void clearForm() {
+    print("Clear");
     // controllerTask.text = task.task;
     controllerTask.clear();
     controllerTanggal.clear();
@@ -44,52 +44,60 @@ class _AddToDoState extends State<AddToDo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: AppBar(
-        leading: BackButton(
+    return WillPopScope(
+      onWillPop: ()async{
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        clearForm();
+        Navigator.pop(context);
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              clearForm();
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            widget.isUpdate != true ? "Tugas Baru" : "Update Kegiatan",
+            style: Theme.of(context).textTheme.headline1,
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
           onPressed: () {
-            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-            Navigator.pop(context);
+            /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
+            Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
+            if (controllerTask.text == "") {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(todoNull);
+              return;
+            }
+            ToDo item = widget.isUpdate != true
+                ? ToDo(
+                    task: controllerTask.text,
+                    tanggal: controllerTanggal.text,
+                    jam: controllerJam.text,
+                    dateTime: dateTime,
+                    isDone: false)
+                : ToDo(
+                    id: widget.task.id,
+                    task: controllerTask.text,
+                    tanggal: controllerTanggal.text,
+                    jam: controllerJam.text,
+                    dateTime: dateTime,
+                    isDone: false);
+            Navigator.pop(context, item);
             clearForm();
           },
+          child: Icon(
+            Icons.check,
+          ),
         ),
-        title: Text(
-          widget.isUpdate != true ? "Tugas Baru" : "Update Kegiatan",
-          style: Theme.of(context).textTheme.headline1,
-        ),
+        body: BodyInput(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
-          Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
-          if (controllerTask.text == "") {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(todoNull);
-            return;
-          }
-          ToDo item = widget.isUpdate != true
-              ? ToDo(
-                  task: controllerTask.text,
-                  tanggal: controllerTanggal.text,
-                  jam: controllerJam.text,
-                  dateTime: dateTime,
-                  isDone: false)
-              : ToDo(
-                  id: widget.task.id,
-                  task: controllerTask.text,
-                  tanggal: controllerTanggal.text,
-                  jam: controllerJam.text,
-                  dateTime: dateTime,
-                  isDone: false);
-          Navigator.pop(context, item);
-          clearForm();
-        },
-        child: Icon(
-          Icons.check,
-        ),
-      ),
-      body: BodyInput(),
     );
   }
 }
@@ -107,11 +115,12 @@ class _BodyInputState extends State<BodyInput> {
 
   Future<void> showTanggal() async {
     final DateTime date = await showDatePicker(
-        helpText: "Pilih tanggal",
-        context: context,
-        initialDate: isUpdating != false ? dateTime : dateTimeNow,
-        firstDate: DateTime(2020), // batas awal tahun
-        lastDate: DateTime(9000)); // batas akhir tahun
+      helpText: "Pilih tanggal",
+      context: context,
+      initialDate: dateTimeNow,
+      firstDate: DateTime(2020), // batas awal tahun
+      lastDate: DateTime(9000),
+    ); // batas akhir tahun
     setState(() {
       if (date != null) {
         /* Show to interface */
@@ -125,11 +134,12 @@ class _BodyInputState extends State<BodyInput> {
 
   Future<void> showJam() async {
     final TimeOfDay result = await showTimePicker(
-        context: context,
-        initialTime: isUpdating != true
-            ? TimeOfDay.now()
-            : TimeOfDay.fromDateTime(dateTime),
-        helpText: "Atur Waktu Kegiatan");
+      context: context,
+      initialTime: isUpdating != true
+          ? TimeOfDay.now()
+          : TimeOfDay.fromDateTime(dateTime),
+      helpText: "Atur Waktu Kegiatan",
+    );
 
     setState(() {
       if (result != null) {
@@ -199,9 +209,7 @@ class _TextFormState extends State<MyTextForm> {
   Widget build(BuildContext context) {
     return TextFormField(
       style: TextStyle(
-          color: dateTime.isBefore(DateTime.now())
-              ? Colors.red
-              : Colors.white,
+          color: dateTime.isBefore(DateTime.now()) ? Colors.red : Colors.white,
           fontWeight: FontWeight.w600),
       controller: widget.controller,
       readOnly: true,

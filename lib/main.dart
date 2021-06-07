@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'To-do List App',
         theme: ThemeData(
+          primarySwatch: Colors.teal,
           pageTransitionsTheme: PageTransitionsTheme(builders: {
             TargetPlatform.android: RotationFadeTransitionBuilder()
           }),
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.teal.shade700,
           inputDecorationTheme: InputDecorationTheme(),
           textTheme: TextTheme(
+              overline: TextStyle(fontSize: 15),
               bodyText1: TextStyle(color: Colors.white60),
               bodyText2: TextStyle(color: Colors.white),
               headline1: TextStyle(
