@@ -191,10 +191,12 @@ class _HomePageState extends State<HomePage> {
                   task: task,
                   isUpdate: true,
                 )));
-    try {
-      await DB.update(ToDo.table, items);
-    } catch (er) {
-      print(er);
+    if (items != null) {
+      try {
+        await DB.update(ToDo.table, items);
+      } catch (er) {
+        print(er);
+      }
     }
     refresh();
   }
@@ -215,7 +217,6 @@ class _HomePageState extends State<HomePage> {
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
-
       margin: index != this.tasks.length - 1
           ? EdgeInsets.fromLTRB(10, 10, 10, 5)
           : EdgeInsets.fromLTRB(10, 10, 10, 60),
@@ -274,7 +275,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               savedHeading != headingTask(tasks[index], index)
                   ? Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 20),
+                      padding: const EdgeInsets.only(left: 20, top: 20),
                       child: Text(
                         headingTask(tasks[index], index),
                         style: TextStyle(
