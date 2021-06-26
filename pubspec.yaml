@@ -29,7 +29,7 @@ flutter_icons:
   # flutter pub run flutter_launcher_icons:main
   android: "launcher_icon"
   ios: true
-  image_path: "assets/img/ketua.png"
+  image_path: "assets/img/Koala.png"
 
 flutter_native_splash:
   # flutter pub run flutter_native_splash:create
@@ -37,7 +37,7 @@ flutter_native_splash:
   color: "#009788"
   android: true
   web: true
-  image: assets/img/ketua.png
+  image: assets/img/Koala.png
 
 
 flutter:

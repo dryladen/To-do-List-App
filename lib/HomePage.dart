@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
@@ -50,14 +49,13 @@ class _HomePageState extends State<HomePage> {
           style: Theme.of(context).textTheme.headline1,
         ),
         actions: [
-          /* SEMENTARA AJA, BUAT NGETEST DATABASE */
           PopupMenuButton(
               onSelected: (value) {
                 popMenuItemAction(value);
               },
               itemBuilder: (context) => [
                     PopupMenuItem(
-                      child: Text("About"),
+                      child: Text("Dibuat oleh"),
                       height: 10,
                       value: "About",
                     )
@@ -80,7 +78,6 @@ class _HomePageState extends State<HomePage> {
                 );
                 await Future.delayed(Duration(seconds: 2));
                 setState(() {});
-                // listView();
                 print("Refresh");
               }),
       floatingActionButton: FloatingActionButton(
@@ -104,9 +101,13 @@ class _HomePageState extends State<HomePage> {
     if (task.dateTime.isBefore(DateTime.now())) {
       text = "Sudah Lewat, ${task.tanggal}";
     } else if (dateCheck == today) {
-      text = "Hari ini";
+      text = "Pukul";
     } else if (dateCheck == tommorow) {
-      text = "Besok";
+      if (task.jam != "") {
+        text = "Pukul";
+      } else {
+        text = " ";
+      }
     } else {
       text = task.tanggal;
     }
@@ -147,16 +148,29 @@ class _HomePageState extends State<HomePage> {
       showAboutDialog(
           context: context,
           applicationIcon: Image.asset(
-            "assets/img/ketua.png",
+            "assets/img/Koala.png",
             height: 50,
           ),
           applicationName: "ToDo List App",
           applicationVersion: "1.0.2",
           children: [
-            Center(child: Text("Kelompok 6 - Oozma Kappa")),
-            Text("1915016069 - Delfan Rynaldo Laden"),
-            Text("1915016074 - Oktavian Yoga"),
-            Text("1915016093 - Muhammad Irvansyah")
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Icon(Icons.android),
+                  Center(
+                      child: Text(
+                    "Developer",
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22),
+                  )),
+                  Icon(Icons.android)
+                ],
+              ),
+            ),
+            Text("- Delfan Rynaldo Laden"),
+            Text("- Oktavian Yoga Syahputra"),
+            Text("- Muhammad Irvansyah")
           ]);
     }
   }
@@ -218,10 +232,10 @@ class _HomePageState extends State<HomePage> {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
       margin: index != this.tasks.length - 1
-          ? EdgeInsets.fromLTRB(10, 10, 10, 5)
-          : EdgeInsets.fromLTRB(10, 10, 10, 60),
+          ? EdgeInsets.fromLTRB(10, 2, 10, 5)
+          : EdgeInsets.fromLTRB(10, 2, 10, 60),
       decoration: BoxDecoration(
-          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
+          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(15)),
       child: ListTile(
           onTap: () => _update(tasks),
           key: ValueKey<ToDo>(tasks),
