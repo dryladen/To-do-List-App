@@ -45,7 +45,7 @@ class _AddToDoState extends State<AddToDo> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: ()async{
+      onWillPop: () async {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         clearForm();
         Navigator.pop(context);
@@ -204,7 +204,7 @@ class _BodyInputState extends State<BodyInput> {
 }
 
 /* Class for date form and time form (The second and the third one) */
-class _TextFormState extends State<MyTextForm> {
+class _MyTextFormState extends State<MyTextForm> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -215,9 +215,10 @@ class _TextFormState extends State<MyTextForm> {
       readOnly: true,
       onTap: widget.onTap,
       decoration: InputDecoration(
+          fillColor: Colors.transparent,
           icon: Icon(
             widget.iconData,
-            color: Colors.tealAccent.shade100,
+            color: Theme.of(context).floatingActionButtonTheme.backgroundColor,
           ),
           hintText: widget.hintText,
           hintStyle: Theme.of(context).textTheme.bodyText1,
@@ -255,10 +256,11 @@ class FormTodo extends StatelessWidget {
           controller: controller,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-              icon: Icon(
-                icon,
-                color: Colors.tealAccent.shade100,
-              ),
+              fillColor: Colors.transparent,
+              icon: Icon(icon,
+                  color: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor),
               hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyText1,
               contentPadding: EdgeInsets.only(bottom: 2),
@@ -306,5 +308,5 @@ class MyTextForm extends StatefulWidget {
 
   MyTextForm({this.onTap, this.controller, this.hintText, this.iconData});
   @override
-  _TextFormState createState() => _TextFormState();
+  _MyTextFormState createState() => _MyTextFormState();
 }

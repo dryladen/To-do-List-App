@@ -221,7 +221,8 @@ class _HomePageState extends State<HomePage> {
           ? EdgeInsets.fromLTRB(10, 10, 10, 5)
           : EdgeInsets.fromLTRB(10, 10, 10, 60),
       decoration: BoxDecoration(
-          color: Colors.teal.shade300, borderRadius: BorderRadius.circular(20)),
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(20)),
       child: ListTile(
           onTap: () => _update(tasks),
           key: ValueKey<ToDo>(tasks),
