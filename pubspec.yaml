@@ -34,7 +34,7 @@ flutter_icons:
 flutter_native_splash:
   # flutter pub run flutter_native_splash:create
   # flutter pub run flutter_native_splash:remove
-  color: "#009788"
+  color: "#1E1E1E"
   android: true
   web: true
   image: assets/img/ketua.png
