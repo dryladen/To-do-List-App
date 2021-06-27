@@ -16,6 +16,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   Color header = Color(0xff1E1E1E);
   Color main = Color(0xff292A2D);
+  Color blueMain = Color(0xff8bd3e1);
 
   MaterialColor myColor = MaterialColor(0xff8bd3e1, {
     50: Color(0xffF1FAFB),
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'To-do List App',
+        title: 'ToDoList',
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: myColor,
@@ -43,11 +44,10 @@ class MyApp extends StatelessWidget {
           }),
           floatingActionButtonTheme: FloatingActionButtonThemeData(
               backgroundColor: Colors.white, foregroundColor: main),
-          primaryColor: header,
           /* Header */
-          backgroundColor: main,
+          primaryColor: header,
           /* Main */
-          inputDecorationTheme: InputDecorationTheme(),
+          backgroundColor: main,
           textTheme: TextTheme(
               overline: TextStyle(fontSize: 15),
               bodyText1: TextStyle(color: Colors.white60),
@@ -66,9 +66,11 @@ class MyApp extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w900),
               headline4: TextStyle(
-                  // Date Style
-                  color: Colors.white,
-                  fontSize: 13),
+                // Date Style
+                color: Colors.red,
+                fontWeight: FontWeight.bold
+              ),
+              headline5: TextStyle(fontSize: 13, color: Colors.white),
               headline6: TextStyle(
                   /* Date Stryle if passed */
                   color: Colors.red.shade900,

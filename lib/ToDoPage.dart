@@ -10,6 +10,7 @@ DateTime dateTime = DateTime(9000);
 String jam24 = "23:59:59";
 String yMMd = "9000-01-01";
 bool isUpdating = false;
+bool isJamVisible = false;
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -103,13 +104,14 @@ class _AddToDoState extends State<AddToDo> {
 }
 
 class _BodyInputState extends State<BodyInput> {
-  Widget headerForm(String text) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.headline2,
-    );
-  }
-
+/* 
+?██████╗  █████╗ ████████╗███████╗████████╗██╗███╗   ███╗███████╗
+?██╔══██╗██╔══██╗╚══██╔══╝██╔════╝╚══██╔══╝██║████╗ ████║██╔════╝
+?██║  ██║███████║   ██║   █████╗     ██║   ██║██╔████╔██║█████╗  
+?██║  ██║██╔══██║   ██║   ██╔══╝     ██║   ██║██║╚██╔╝██║██╔══╝  
+?██████╔╝██║  ██║   ██║   ███████╗   ██║   ██║██║ ╚═╝ ██║███████╗
+?╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝   ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝
+*/
   DateTime dateTimeNow = DateTime.now();
   final DateFormat formatTanggal = DateFormat('MMM d, y'); // Mengatur format
 
@@ -118,6 +120,7 @@ class _BodyInputState extends State<BodyInput> {
       helpText: "Pilih tanggal",
       context: context,
       initialDate: dateTimeNow,
+
       firstDate: DateTime(2020), // batas awal tahun
       lastDate: DateTime(9000),
     ); // batas akhir tahun
@@ -157,6 +160,14 @@ class _BodyInputState extends State<BodyInput> {
     });
   }
 
+/* 
+!██╗    ██╗██╗██████╗  ██████╗ ███████╗████████╗
+!██║    ██║██║██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
+!██║ █╗ ██║██║██║  ██║██║  ███╗█████╗     ██║   
+!██║███╗██║██║██║  ██║██║   ██║██╔══╝     ██║   
+!╚███╔███╔╝██║██████╔╝╚██████╔╝███████╗   ██║   
+! ╚══╝╚══╝ ╚═╝╚═════╝  ╚═════╝ ╚══════╝   ╚═╝ 
+*/
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -175,65 +186,70 @@ class _BodyInputState extends State<BodyInput> {
           // Form bagian mengisi tanggal
           headerForm("Tanggal Kegiatan"),
           Padding(padding: EdgeInsets.only(top: 10)),
-          MyTextForm(
+          DateTimeForm(
             onTap: showTanggal,
             controller: controllerTanggal,
             hintText: "Tanggal Belum Ditentukan",
             iconData: Icons.date_range_rounded,
+            iconButton: iconBtnX(controllerTanggal),
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
-          controllerTanggal.text != ""
-              ? Column(
-                  // mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headerForm("Waktu Kegiatan"),
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    MyTextForm(
-                        onTap: showJam,
-                        controller: controllerJam,
-                        hintText: "Jam Belum Ditentukan",
-                        iconData: Icons.access_time_outlined),
-                  ],
-                )
-              : Text(""),
+          Visibility(
+              visible: controllerTanggal.text != "",
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  headerForm("Waktu Kegiatan"),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  DateTimeForm(
+                    onTap: showJam,
+                    controller: controllerJam,
+                    hintText: "Jam Belum Ditentukan",
+                    iconData: Icons.access_time_outlined,
+                    iconButton: iconBtnX(controllerJam),
+                  ),
+                ],
+              ))
         ],
       ),
     );
   }
-}
 
-/* Class for date form and time form (The second and the third one) */
-class _MyTextFormState extends State<MyTextForm> {
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      style: TextStyle(
-          color: dateTime.isBefore(DateTime.now()) ? Colors.red : Colors.white,
-          fontWeight: FontWeight.w600),
-      controller: widget.controller,
-      readOnly: true,
-      onTap: widget.onTap,
-      decoration: InputDecoration(
-          fillColor: Colors.transparent,
-          icon: Icon(
-            widget.iconData,
-            color: Theme.of(context).floatingActionButtonTheme.backgroundColor,
-          ),
-          hintText: widget.hintText,
-          hintStyle: Theme.of(context).textTheme.bodyText1,
-          contentPadding: EdgeInsets.only(bottom: 2),
-          isDense: true,
-          filled: true,
-          enabledBorder: UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).primaryColor, width: 2)),
-          focusedBorder: UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).primaryColor, width: 3))),
+  Widget headerForm(String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.headline2,
+    );
+  }
+
+  Widget iconBtnX(TextEditingController controller) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      constraints: BoxConstraints(maxHeight: 20, maxWidth: 20),
+      icon: Icon(Icons.close),
+      color: Colors.white,
+      iconSize: 20,
+      onPressed: () {
+        if (controller == controllerTanggal) {
+          controllerTanggal.text = "";
+          controllerJam.text = "";
+        } else {
+          controllerJam.text = "";
+        }
+        setState(() {});
+      },
     );
   }
 }
+
+/* 
+*██╗███╗   ██╗██████╗ ██╗   ██╗████████╗
+*██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝
+*██║██╔██╗ ██║██████╔╝██║   ██║   ██║   
+*██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║   
+*██║██║ ╚████║██║     ╚██████╔╝   ██║   
+*╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝ 
+ */
 
 /* Class of Form Task (The first one) */
 
@@ -284,6 +300,50 @@ class FormTodo extends StatelessWidget {
   }
 }
 
+/* Class for date form and time form (The second and the third one) */
+class _DateTimeFormState extends State<DateTimeForm> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Flexible(
+          fit: FlexFit.tight,
+          child: TextFormField(
+            style: TextStyle(
+                color: dateTime.isBefore(DateTime.now())
+                    ? Colors.red
+                    : Colors.white,
+                fontWeight: FontWeight.w600),
+            controller: widget.controller,
+            readOnly: true,
+            onTap: widget.onTap,
+            decoration: InputDecoration(
+                fillColor: Colors.transparent,
+                icon: Icon(
+                  widget.iconData,
+                  color: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                ),
+                hintText: widget.hintText,
+                hintStyle: Theme.of(context).textTheme.bodyText1,
+                contentPadding: EdgeInsets.only(bottom: 2),
+                isDense: true,
+                filled: true,
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor, width: 2)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor, width: 3))),
+          ),
+        ),
+        widget.controller.text != "" ? widget.iconButton : Text("")
+      ],
+    );
+  }
+}
+
 // ignore: must_be_immutable
 class AddToDo extends StatefulWidget {
   bool isUpdate;
@@ -300,13 +360,19 @@ class BodyInput extends StatefulWidget {
 }
 
 // ignore: must_be_immutable
-class MyTextForm extends StatefulWidget {
+class DateTimeForm extends StatefulWidget {
   void Function() onTap;
   TextEditingController controller;
   String hintText;
   IconData iconData;
+  IconButton iconButton;
 
-  MyTextForm({this.onTap, this.controller, this.hintText, this.iconData});
+  DateTimeForm(
+      {this.onTap,
+      this.controller,
+      this.hintText,
+      this.iconData,
+      this.iconButton});
   @override
-  _MyTextFormState createState() => _MyTextFormState();
+  _DateTimeFormState createState() => _DateTimeFormState();
 }

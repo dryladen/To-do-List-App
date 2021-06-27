@@ -40,63 +40,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          "To-do List App",
-          style: Theme.of(context).textTheme.headline1,
-        ),
-        actions: [
-          /* SEMENTARA AJA, BUAT NGETEST DATABASE */
-          PopupMenuButton(
-              onSelected: (value) {
-                popMenuItemAction(value);
-              },
-              itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text("About"),
-                      height: 10,
-                      value: "About",
-                    )
-                  ])
-        ],
-      ),
-      /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
-      body: tasks.length == 0
-          ? Center(
-              child: Image.asset(
-              'assets/img/Koala.png',
-              height: 90,
-            ))
-          : RefreshIndicator(
-              key: _refreshKey,
-              child: listView(),
-              onRefresh: () async {
-                _refreshKey.currentState.show(
-                  atTop: true,
-                );
-                await Future.delayed(Duration(seconds: 2));
-                setState(() {});
-                // listView();
-                print("Refresh");
-              }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
-          ToDo items = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  fullscreenDialog: true, builder: (context) => AddToDo()));
-          _save(items);
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-
   String subtitleText(ToDo task) {
     String text;
     final dateCheck =
@@ -110,7 +53,6 @@ class _HomePageState extends State<HomePage> {
     } else {
       text = task.tanggal;
     }
-
     if (task.jam != "") {
       text += " - ${task.jam}";
     }
@@ -150,7 +92,7 @@ class _HomePageState extends State<HomePage> {
             "assets/img/ketua.png",
             height: 50,
           ),
-          applicationName: "ToDo List App",
+          applicationName: "ToDoApp",
           applicationVersion: "1.0.2",
           children: [
             Center(child: Text("Kelompok 6 - Oozma Kappa")),
@@ -161,6 +103,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+/* 
+?██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
+?██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝
+?██║  ██║███████║   ██║   ███████║██████╔╝███████║███████╗█████╗  
+?██║  ██║██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██║╚════██║██╔══╝  
+?██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗
+?╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+ */
   void refresh() async {
     try {
       List<Map<dynamic, dynamic>> _results = await DB.query(ToDo.table);
@@ -213,6 +163,15 @@ class _HomePageState extends State<HomePage> {
     refresh();
   }
 
+/* 
+*██╗    ██╗██╗██████╗  ██████╗ ███████╗████████╗
+*██║    ██║██║██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
+*██║ █╗ ██║██║██║  ██║██║  ███╗█████╗     ██║   
+*██║███╗██║██║██║  ██║██║   ██║██╔══╝     ██║   
+*╚███╔███╔╝██║██████╔╝╚██████╔╝███████╗   ██║   
+* ╚══╝╚══╝ ╚═╝╚═════╝  ╚═════╝ ╚══════╝   ╚═╝  
+ */
+
   /* List of todo */
   Widget _buildItem(ToDo tasks, [int index]) {
     return Container(
@@ -238,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                     Text(subtitleText(tasks),
                         style: subtitleText(tasks).contains("Sudah Lewat")
                             ? Theme.of(context).textTheme.headline6
-                            : Theme.of(context).textTheme.headline4),
+                            : Theme.of(context).textTheme.headline5),
                   ],
                 )
               : null,
@@ -263,7 +222,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /* Generate the listview of Heading Text and   */
-  listView() {
+  Widget listView() {
     return AnimatedList(
       physics: const AlwaysScrollableScrollPhysics(),
       key: _listKey,
@@ -294,6 +253,69 @@ class _HomePageState extends State<HomePage> {
           ),
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      appBar: AppBar(
+        title: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: Text(
+              "ToDoApp",
+              style: Theme.of(context).textTheme.headline1,
+            ),
+          ),
+        ),
+        actions: [
+          /* SEMENTARA AJA, BUAT NGETEST DATABASE */
+          PopupMenuButton(
+              padding: EdgeInsets.zero,
+              onSelected: (value) {
+                popMenuItemAction(value);
+              },
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text("About"),
+                      height: 10,
+                      value: "About",
+                    )
+                  ])
+        ],
+      ),
+      /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
+      body: tasks.length == 0
+          ? Center(
+              child: Image.asset(
+              'assets/img/Koala.png',
+              height: 90,
+            ))
+          : RefreshIndicator(
+              key: _refreshKey,
+              child: listView(),
+              onRefresh: () async {
+                _refreshKey.currentState.show(
+                  atTop: true,
+                );
+                await Future.delayed(Duration(seconds: 2));
+                setState(() {});
+                // listView();
+                print("Refresh");
+              }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
+          ToDo items = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  fullscreenDialog: true, builder: (context) => AddToDo()));
+          _save(items);
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
