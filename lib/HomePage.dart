@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart' as appLocale;
 
 class _HomePageState extends State<HomePage> {
 /* Variable untuk menyimpan atribut dari database untuk digunakan selama app berjalan */
@@ -16,23 +17,27 @@ class _HomePageState extends State<HomePage> {
   int count = 0;
   bool isHeading = false;
   String savedHeading = " ";
-  final today =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-  final yesterday = DateTime(
-    DateTime.now().year,
-    DateTime.now().month,
-    DateTime.now().day,
-    DateTime.now().hour,
-    DateTime.now().minute,
-  );
-  final tommorow = DateTime(
-      DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
+
+  /* 
+  ? Bagian DateTime
+   */
+  var now = DateTime.now();
+  DateTime yesterday() {
+    return DateTime(now.year, now.month, now.day, now.hour, now.minute);
+  }
+
+  DateTime today() {
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  DateTime tommorow() {
+    return DateTime(now.year, now.month, now.day + 1);
+  }
 
   @override
   void initState() {
     refresh();
     super.initState();
-    print("InitState");
   }
 
   @override
@@ -44,12 +49,13 @@ class _HomePageState extends State<HomePage> {
     String text;
     final dateCheck =
         DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
-    if (task.dateTime.isBefore(DateTime.now())) {
-      text = "Sudah Lewat, ${task.tanggal}";
-    } else if (dateCheck == today) {
-      text = "Hari ini";
-    } else if (dateCheck == tommorow) {
-      text = "Besok";
+    if (task.dateTime.isBefore(yesterday())) {
+      text =
+          "${appLocale.AppLocalizations.of(context).expired}, ${task.tanggal}";
+    } else if (dateCheck == today()) {
+      text = appLocale.AppLocalizations.of(context).today;
+    } else if (dateCheck == tommorow()) {
+      text = appLocale.AppLocalizations.of(context).tomorrow;
     } else {
       text = task.tanggal;
     }
@@ -64,14 +70,14 @@ class _HomePageState extends State<HomePage> {
     String text;
     final dateCheck =
         DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
-    if (task.dateTime.isBefore(DateTime.now())) {
-      text = "Sudah Lewat";
-    } else if (dateCheck == today) {
-      text = "Hari ini";
-    } else if (dateCheck == tommorow) {
-      text = "Besok";
+    if (task.dateTime.isBefore(yesterday())) {
+      text = appLocale.AppLocalizations.of(context).expired;
+    } else if (dateCheck == today()) {
+      text = appLocale.AppLocalizations.of(context).today;
+    } else if (dateCheck == tommorow()) {
+      text = appLocale.AppLocalizations.of(context).tomorrow;
     } else if (dateCheck == DateTime(9000, 1, 1)) {
-      text = "Tidak Ada Tanggal";
+      text = appLocale.AppLocalizations.of(context).nodate;
     } else {
       text = "Nanti";
     }
@@ -195,7 +201,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     /* Menampilkan teks tanggal */
                     Text(subtitleText(tasks),
-                        style: subtitleText(tasks).contains("Sudah Lewat")
+                        style: subtitleText(tasks).contains(
+                                appLocale.AppLocalizations.of(context).expired)
                             ? Theme.of(context).textTheme.headline6
                             : Theme.of(context).textTheme.headline5),
                   ],
@@ -240,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                         headingTask(tasks[index], index),
                         style: TextStyle(
                             color: headingTask(tasks[index], index) ==
-                                    "Sudah Lewat"
+                                    appLocale.AppLocalizations.of(context).expired
                                 ? Colors.red
                                 : Colors.white,
                             fontSize: 20,

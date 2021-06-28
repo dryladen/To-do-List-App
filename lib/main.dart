@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:todo/services/db_helper.dart';
 import 'package:todo/HomePage.dart';
 import 'package:todo/model/transition.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +38,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'ToDoList',
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate
+        ],
+        supportedLocales: [
+          const Locale('en', ''),
+          const Locale('id', ''),
+        ],
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: myColor,
@@ -66,10 +78,9 @@ class MyApp extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w900),
               headline4: TextStyle(
-                // Date Style
-                color: Colors.red,
-                fontWeight: FontWeight.bold
-              ),
+                  // Date Style
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold),
               headline5: TextStyle(fontSize: 13, color: Colors.white),
               headline6: TextStyle(
                   /* Date Stryle if passed */

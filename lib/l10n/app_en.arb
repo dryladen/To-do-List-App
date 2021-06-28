@@ -1,0 +1,22 @@
+{
+  "helloWorld": "Hello World!",
+  "@helloWorld": {
+    "description": "Awalan"
+  },
+  "expired": "Expired",
+  "@expired": {
+    "description": "Expired"
+  },
+  "today": "Today",
+  "@today": {
+      "desctiption": "Hari ini"
+  },
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "Besok"
+  },
+  "nodate": "Date Not Set",
+  "@nodate": {
+    "description": "Date Not Set"
+  }
+}
