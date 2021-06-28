@@ -321,6 +321,8 @@ class FormTodo extends StatelessWidget {
 
 /* Class for date form and time form (The second and the third one) */
 class _DateTimeFormState extends State<DateTimeForm> {
+  DateTime now = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -329,7 +331,8 @@ class _DateTimeFormState extends State<DateTimeForm> {
           fit: FlexFit.tight,
           child: TextFormField(
             style: TextStyle(
-                color: dateTime.isBefore(DateTime.now())
+                color: dateTime.isBefore(DateTime(
+                        now.year, now.month, now.day, now.hour, now.minute))
                     ? Colors.red
                     : Colors.white,
                 fontWeight: FontWeight.w600),

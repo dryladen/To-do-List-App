@@ -19,12 +19,12 @@ class _HomePageState extends State<HomePage> {
   final today =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   final yesterday = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-      DateTime.now().hour,
-      DateTime.now().minute,
-      DateTime.now().second);
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+    DateTime.now().hour,
+    DateTime.now().minute,
+  );
   final tommorow = DateTime(
       DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
 
