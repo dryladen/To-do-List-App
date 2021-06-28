@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todo/main.dart';
 import 'package:todo/model/Todo.dart';
 
 /* Controller for the todo and date */
@@ -26,6 +27,51 @@ class _AddToDoState extends State<AddToDo> {
     }
   }
 
+  TextButton textButton() {
+    return TextButton(
+        onPressed: () {},
+        child: Text("Tambah"),
+        style: TextButton.styleFrom(
+            backgroundColor: MyApp().blueMain,
+            primary: Colors.white,
+            padding: EdgeInsets.zero,
+            elevation: 20,
+            fixedSize: Size.fromHeight(20)));
+  }
+
+  IconButton iconButton() {
+    return IconButton(
+      icon: Icon(Icons.check),
+      alignment: Alignment.centerLeft,
+      splashRadius: 15,
+      onPressed: () {
+        /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
+            Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
+        if (controllerTask.text == "") {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(todoNull);
+          return;
+        }
+        ToDo item = widget.isUpdate != true
+            ? ToDo(
+                task: controllerTask.text,
+                tanggal: controllerTanggal.text,
+                jam: controllerJam.text,
+                dateTime: dateTime,
+                isDone: false)
+            : ToDo(
+                id: widget.task.id,
+                task: controllerTask.text,
+                tanggal: controllerTanggal.text,
+                jam: controllerJam.text,
+                dateTime: dateTime,
+                isDone: false);
+        Navigator.pop(context, item);
+        clearForm();
+      },
+    );
+  }
+
   void clearForm() {
     print("Clear");
     // controllerTask.text = task.task;
@@ -47,6 +93,7 @@ class _AddToDoState extends State<AddToDo> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         clearForm();
         Navigator.pop(context);
@@ -62,39 +109,10 @@ class _AddToDoState extends State<AddToDo> {
               Navigator.pop(context);
             },
           ),
+          actions: [iconButton()],
           title: Text(
             widget.isUpdate != true ? "Tugas Baru" : "Update Kegiatan",
             style: Theme.of(context).textTheme.headline1,
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
-            Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
-            if (controllerTask.text == "") {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(todoNull);
-              return;
-            }
-            ToDo item = widget.isUpdate != true
-                ? ToDo(
-                    task: controllerTask.text,
-                    tanggal: controllerTanggal.text,
-                    jam: controllerJam.text,
-                    dateTime: dateTime,
-                    isDone: false)
-                : ToDo(
-                    id: widget.task.id,
-                    task: controllerTask.text,
-                    tanggal: controllerTanggal.text,
-                    jam: controllerJam.text,
-                    dateTime: dateTime,
-                    isDone: false);
-            Navigator.pop(context, item);
-            clearForm();
-          },
-          child: Icon(
-            Icons.check,
           ),
         ),
         body: BodyInput(),
@@ -195,6 +213,7 @@ class _BodyInputState extends State<BodyInput> {
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           Visibility(
+              maintainState: true,
               visible: controllerTanggal.text != "",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +228,7 @@ class _BodyInputState extends State<BodyInput> {
                     iconButton: iconBtnX(controllerJam),
                   ),
                 ],
-              ))
+              )),
         ],
       ),
     );
