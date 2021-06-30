@@ -254,10 +254,14 @@ class _BodyInputState extends State<BodyInput> {
       iconSize: 20,
       onPressed: () {
         if (controller == controllerTanggal) {
-          controllerTanggal.text = "";
-          controllerJam.text = "";
+          print("Hapus Date");
+          controllerTanggal.clear();
+          controllerJam.clear();
+          dateTime = DateTime(9000);
         } else {
-          controllerJam.text = "";
+          print("Hapus Jam");
+          controllerJam.clear();
+          dateTime = DateTime(9000);
         }
         setState(() {});
       },

@@ -161,8 +161,8 @@ class _HomePageState extends State<HomePage> {
   void _delete(ToDo item, int index) async {
     var task = tasks.removeAt(index);
     _listKey.currentState.removeItem(index, (context, animation) {
-      return FadeTransition(
-        opacity: animation,
+      return SlideTransition(
+        position: Tween(begin: Offset.zero,end: Offset(1, 0)).animate(animation),
         child: _buildItem(task),
       );
     });
@@ -190,6 +190,7 @@ class _HomePageState extends State<HomePage> {
           color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.circular(20)),
       child: ListTile(
+          onLongPress: () => print("Panjang"),
           onTap: () => _update(tasks),
           key: ValueKey<ToDo>(tasks),
           title: Text(
@@ -234,8 +235,8 @@ class _HomePageState extends State<HomePage> {
       key: _listKey,
       initialItemCount: tasks.length,
       itemBuilder: (context, index, animation) {
-        return FadeTransition(
-          opacity: animation,
+        return SlideTransition(
+          position: Tween(begin: Offset(1, 0),end: Offset(0,0)).animate(animation),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
