@@ -42,9 +42,9 @@ class _AddToDoState extends State<AddToDo> {
 
   IconButton iconButton() {
     return IconButton(
-      icon: Icon(Icons.check),
-      alignment: Alignment.centerLeft,
-      splashRadius: 15,
+      icon: Icon(Icons.check_sharp),
+      alignment: Alignment.center,
+      splashRadius: 20,
       onPressed: () {
         /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
             Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
@@ -102,7 +102,9 @@ class _AddToDoState extends State<AddToDo> {
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-          leading: BackButton(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_sharp),
+            splashRadius: 20,
             onPressed: () {
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               clearForm();

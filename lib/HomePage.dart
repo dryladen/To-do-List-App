@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     } else if (dateCheck == DateTime(9000, 1, 1)) {
       text = appLocale.AppLocalizations.of(context).nodate;
     } else {
-      text = "Nanti";
+      text = appLocale.AppLocalizations.of(context).later;
     }
 
     savedHeading = text;

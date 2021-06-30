@@ -15,6 +15,10 @@
   "@tomorrow": {
     "description": "Besok"
   },
+  "later": "Later",
+  "@later": {
+    "description": "Later"
+  },
   "nodate": "Date Not Set",
   "@nodate": {
     "description": "Date Not Set"
