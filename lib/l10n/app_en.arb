@@ -18,5 +18,54 @@
   "nodate": "Date Not Set",
   "@nodate": {
     "description": "Date Not Set"
+  },
+
+  
+
+
+
+  "newtask": "New Activity",
+  "@newtask": {
+    "description": "New Task"
+  },
+  "updatetask": "Update Activity",
+  "@updatetask": {
+    "description": "Update Activity"
+  },
+  "whatTodo": "What you want to do?",
+  "@whatTodo": {
+    "description": "What you wanna do"
+  },
+  "hintFormTodo": "Example: Meeting",
+  "@hintFormTodo": {
+    "description": "Hint Text"
+  },
+  "dateHeading": "Date of activity",
+  "@dateHeading":{
+    "description": "Heading of Date Form"
+  },
+  "hintDateForm": "Date has not been determined",
+  "@hintDateForm": {
+    "description": "Hint Text of Date Form"
+  },
+  "dateHelpText": "Select Date",
+  "@dateHelpText": {
+    "description": "Help Text of Date Picker"
+  },
+  "timeHeading": "Activity Time",
+  "@timeHeading": {
+    "description": "Heading of Time Form"
+  },
+  "hintTimeForm": "Time has not been determined",
+  "@hintTimeForm": {
+    "description": "Hint Text of Time Form"
+  },
+  "timeHelpText": "Set the time of the activity",
+  "@timeHelpText": {
+    "description": "Help Text of Time Form"
+  },
+  "snackBarText": "Activities must not be empty",
+  "@snackBarText": {
+    "description": "SnackBar Text"
   }
 }

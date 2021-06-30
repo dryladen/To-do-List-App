@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
+import 'package:todo/main.dart';
 import 'package:todo/model/Todo.dart';
 import 'package:todo/services/db_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart' as appLocale;
@@ -209,6 +210,7 @@ class _HomePageState extends State<HomePage> {
                 )
               : null,
           trailing: IconButton(
+            padding: EdgeInsets.zero,
             onPressed: () {
               setState(() {
                 tasks.isDone = true;
@@ -220,10 +222,7 @@ class _HomePageState extends State<HomePage> {
                     Icons.radio_button_off_rounded,
                     color: white,
                   )
-                : Icon(
-                    Icons.check_circle,
-                    color: white,
-                  ),
+                : Icon(Icons.check_circle, color: MyApp().blueMain),
           )),
     );
   }
@@ -247,7 +246,8 @@ class _HomePageState extends State<HomePage> {
                         headingTask(tasks[index], index),
                         style: TextStyle(
                             color: headingTask(tasks[index], index) ==
-                                    appLocale.AppLocalizations.of(context).expired
+                                    appLocale.AppLocalizations.of(context)
+                                        .expired
                                 ? Colors.red
                                 : Colors.white,
                             fontSize: 20,
@@ -263,19 +263,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // !Main Build
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        title: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 30),
-            child: Text(
-              "ToDoApp",
-              style: Theme.of(context).textTheme.headline1,
-            ),
-          ),
+        centerTitle: true,
+        title: Text(
+          "ToDoApp",
+          style: Theme.of(context).textTheme.headline1,
         ),
         actions: [
           /* SEMENTARA AJA, BUAT NGETEST DATABASE */

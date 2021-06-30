@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo/main.dart';
 import 'package:todo/model/Todo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart' as al;
 
 /* Controller for the todo and date */
 TextEditingController controllerTask = TextEditingController();
@@ -49,7 +50,8 @@ class _AddToDoState extends State<AddToDo> {
             Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
         if (controllerTask.text == "") {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(todoNull);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(al.AppLocalizations.of(context).snackBarText)));
           return;
         }
         ToDo item = widget.isUpdate != true
@@ -87,8 +89,6 @@ class _AddToDoState extends State<AddToDo> {
     isUpdating = false;
   }
 
-  final todoNull = SnackBar(content: Text("Kegiatan tidak boleh kosong"));
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -111,7 +111,9 @@ class _AddToDoState extends State<AddToDo> {
           ),
           actions: [iconButton()],
           title: Text(
-            widget.isUpdate != true ? "Tugas Baru" : "Update Kegiatan",
+            widget.isUpdate != true
+                ? al.AppLocalizations.of(context).newtask
+                : al.AppLocalizations.of(context).updatetask,
             style: Theme.of(context).textTheme.headline1,
           ),
         ),
@@ -135,7 +137,7 @@ class _BodyInputState extends State<BodyInput> {
 
   Future<void> showTanggal() async {
     final DateTime date = await showDatePicker(
-      helpText: "Pilih tanggal",
+      helpText: al.AppLocalizations.of(context).dateHelpText,
       context: context,
       initialDate: dateTimeNow,
 
@@ -159,7 +161,7 @@ class _BodyInputState extends State<BodyInput> {
       initialTime: isUpdating != true
           ? TimeOfDay.now()
           : TimeOfDay.fromDateTime(dateTime),
-      helpText: "Atur Waktu Kegiatan",
+      helpText: al.AppLocalizations.of(context).timeHelpText,
     );
 
     setState(() {
@@ -194,20 +196,20 @@ class _BodyInputState extends State<BodyInput> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* Form bagian mengisi todo */
-          headerForm("Apa yang ingin dikerjakan?"),
+          headerForm(al.AppLocalizations.of(context).whatTodo),
           FormTodo(
-            hintText: "Mau Ngapain?",
+            hintText: al.AppLocalizations.of(context).hintFormTodo,
             controller: controllerTask,
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           // Form bagian mengisi tanggal
-          headerForm("Tanggal Kegiatan"),
+          headerForm(al.AppLocalizations.of(context).dateHeading),
           Padding(padding: EdgeInsets.only(top: 10)),
           DateTimeForm(
             onTap: showTanggal,
             controller: controllerTanggal,
-            hintText: "Tanggal Belum Ditentukan",
+            hintText: al.AppLocalizations.of(context).hintDateForm,
             iconData: Icons.date_range_rounded,
             iconButton: iconBtnX(controllerTanggal),
           ),
@@ -218,12 +220,12 @@ class _BodyInputState extends State<BodyInput> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  headerForm("Waktu Kegiatan"),
+                  headerForm(al.AppLocalizations.of(context).timeHeading),
                   Padding(padding: EdgeInsets.only(top: 10)),
                   DateTimeForm(
                     onTap: showJam,
                     controller: controllerJam,
-                    hintText: "Jam Belum Ditentukan",
+                    hintText: al.AppLocalizations.of(context).hintTimeForm,
                     iconData: Icons.access_time_outlined,
                     iconButton: iconBtnX(controllerJam),
                   ),
