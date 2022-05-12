@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:todo/ToDoPage.dart';
 import 'package:todo/main.dart';
@@ -46,10 +45,68 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      appBar: AppBar(
+        title: Text(
+          "To-do List App",
+          style: Theme.of(context).textTheme.headline1,
+        ),
+        actions: [
+          PopupMenuButton(
+              onSelected: (value) {
+                popMenuItemAction(value);
+              },
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text("Dibuat oleh"),
+                      height: 10,
+                      value: "About",
+                    )
+                  ])
+        ],
+      ),
+      /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
+      body: tasks.length == 0
+          ? Center(
+              child: Image.asset(
+              'assets/img/Koala.png',
+              height: 90,
+            ))
+          : RefreshIndicator(
+              key: _refreshKey,
+              child: listView(),
+              onRefresh: () async {
+                _refreshKey.currentState.show(
+                  atTop: true,
+                );
+                await Future.delayed(Duration(seconds: 2));
+                setState(() {});
+                print("Refresh");
+              }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
+          ToDo items = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  fullscreenDialog: true, builder: (context) => AddToDo()));
+          _save(items);
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+
   String subtitleText(ToDo task) {
     String text;
     final dateCheck =
         DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
+
     if (task.dateTime.isBefore(yesterday())) {
       text =
           "${appLocale.AppLocalizations.of(context).expired}, ${task.tanggal}";
@@ -57,6 +114,7 @@ class _HomePageState extends State<HomePage> {
       text = appLocale.AppLocalizations.of(context).today;
     } else if (dateCheck == tommorow()) {
       text = appLocale.AppLocalizations.of(context).tomorrow;
+
     } else {
       text = task.tanggal;
     }
@@ -96,16 +154,29 @@ class _HomePageState extends State<HomePage> {
       showAboutDialog(
           context: context,
           applicationIcon: Image.asset(
-            "assets/img/ketua.png",
+            "assets/img/Koala.png",
             height: 50,
           ),
           applicationName: "ToDoApp",
           applicationVersion: "1.0.2",
           children: [
-            Center(child: Text("Kelompok 6 - Oozma Kappa")),
-            Text("1915016069 - Delfan Rynaldo Laden"),
-            Text("1915016074 - Oktavian Yoga"),
-            Text("1915016093 - Muhammad Irvansyah")
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Icon(Icons.android),
+                  Center(
+                      child: Text(
+                    "Developer",
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22),
+                  )),
+                  Icon(Icons.android)
+                ],
+              ),
+            ),
+            Text("- Delfan Rynaldo Laden"),
+            Text("- Oktavian Yoga Syahputra"),
+            Text("- Muhammad Irvansyah")
           ]);
     }
   }
@@ -184,11 +255,13 @@ class _HomePageState extends State<HomePage> {
     return Container(
       /* Menambah margin untuk list item paling terakhir */
       margin: index != this.tasks.length - 1
-          ? EdgeInsets.fromLTRB(10, 10, 10, 5)
-          : EdgeInsets.fromLTRB(10, 10, 10, 60),
+          ? EdgeInsets.fromLTRB(10, 2, 10, 5)
+          : EdgeInsets.fromLTRB(10, 2, 10, 60),
       decoration: BoxDecoration(
+
           color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.circular(20)),
+
       child: ListTile(
           onLongPress: () => print("Panjang"),
           onTap: () => _update(tasks),
