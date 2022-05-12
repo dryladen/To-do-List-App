@@ -1,0 +1,21 @@
+{
+  "helloWorld": "Halo Dunia",
+  "expired": "Expired",
+  "today": "Hari ini",
+  "tomorrow": "Besok",
+  "later": "Nanti",
+  "nodate": "Tidak Ada Tanggal",
+
+  "newtask": "Tugas Baru",
+  "updatetask": "Update Kegiatan",
+  "whatTodo": "Apa yang ingin dikerjakan?",
+  "hintFormTodo": "Contoh: Pertemuan",
+  "dateHeading": "Tanggal Kegiatan",
+  "hintDateForm": "Tanggal Belum Ditentukan",
+  "dateHelpText": "Pilih Tanggal",
+  "timeHeading": "Waktu Kegiatan",
+  "hintTimeForm": "Waktu Belum Ditentukan",
+  "timeHelpText": "Atur Waktu Kegiatan",
+  "snackBarText": "Kegiatan Tidak Boleh Kosong"
+
+}

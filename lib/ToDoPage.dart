@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todo/main.dart';
 import 'package:todo/model/Todo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart' as al;
 
 /* Controller for the todo and date */
 TextEditingController controllerTask = TextEditingController();
@@ -10,6 +12,7 @@ DateTime dateTime = DateTime(9000);
 String jam24 = "23:59:59";
 String yMMd = "9000-01-01";
 bool isUpdating = false;
+bool isJamVisible = false;
 
 class _AddToDoState extends State<AddToDo> {
   @override
@@ -23,6 +26,52 @@ class _AddToDoState extends State<AddToDo> {
       yMMd = DateFormat("y-MM-dd").format(widget.task.dateTime);
       super.initState();
     }
+  }
+
+  TextButton textButton() {
+    return TextButton(
+        onPressed: () {},
+        child: Text("Tambah"),
+        style: TextButton.styleFrom(
+            backgroundColor: MyApp().blueMain,
+            primary: Colors.white,
+            padding: EdgeInsets.zero,
+            elevation: 20,
+            fixedSize: Size.fromHeight(20)));
+  }
+
+  IconButton iconButton() {
+    return IconButton(
+      icon: Icon(Icons.check_sharp),
+      alignment: Alignment.center,
+      splashRadius: 20,
+      onPressed: () {
+        /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
+            Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
+        if (controllerTask.text == "") {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(al.AppLocalizations.of(context).snackBarText)));
+          return;
+        }
+        ToDo item = widget.isUpdate != true
+            ? ToDo(
+                task: controllerTask.text,
+                tanggal: controllerTanggal.text,
+                jam: controllerJam.text,
+                dateTime: dateTime,
+                isDone: false)
+            : ToDo(
+                id: widget.task.id,
+                task: controllerTask.text,
+                tanggal: controllerTanggal.text,
+                jam: controllerJam.text,
+                dateTime: dateTime,
+                isDone: false);
+        Navigator.pop(context, item);
+        clearForm();
+      },
+    );
   }
 
   void clearForm() {
@@ -40,12 +89,11 @@ class _AddToDoState extends State<AddToDo> {
     isUpdating = false;
   }
 
-  final todoNull = SnackBar(content: Text("Kegiatan tidak boleh kosong"));
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: ()async{
+      onWillPop: () async {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         clearForm();
         Navigator.pop(context);
@@ -54,46 +102,21 @@ class _AddToDoState extends State<AddToDo> {
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-          leading: BackButton(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_sharp),
+            splashRadius: 20,
             onPressed: () {
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               clearForm();
               Navigator.pop(context);
             },
           ),
+          actions: [iconButton()],
           title: Text(
-            widget.isUpdate != true ? "Tugas Baru" : "Update Kegiatan",
+            widget.isUpdate != true
+                ? al.AppLocalizations.of(context).newtask
+                : al.AppLocalizations.of(context).updatetask,
             style: Theme.of(context).textTheme.headline1,
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            /* Jika tidak sedang update maka id tidak perlu di store karena akan dibuatkan database
-            Jika sedang update id harus dimasukkan, agar tau dimana posisi data yang ingin diupdate */
-            if (controllerTask.text == "") {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(todoNull);
-              return;
-            }
-            ToDo item = widget.isUpdate != true
-                ? ToDo(
-                    task: controllerTask.text,
-                    tanggal: controllerTanggal.text,
-                    jam: controllerJam.text,
-                    dateTime: dateTime,
-                    isDone: false)
-                : ToDo(
-                    id: widget.task.id,
-                    task: controllerTask.text,
-                    tanggal: controllerTanggal.text,
-                    jam: controllerJam.text,
-                    dateTime: dateTime,
-                    isDone: false);
-            Navigator.pop(context, item);
-            clearForm();
-          },
-          child: Icon(
-            Icons.check,
           ),
         ),
         body: BodyInput(),
@@ -103,21 +126,23 @@ class _AddToDoState extends State<AddToDo> {
 }
 
 class _BodyInputState extends State<BodyInput> {
-  Widget headerForm(String text) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.headline2,
-    );
-  }
-
+/* 
+?██████╗  █████╗ ████████╗███████╗████████╗██╗███╗   ███╗███████╗
+?██╔══██╗██╔══██╗╚══██╔══╝██╔════╝╚══██╔══╝██║████╗ ████║██╔════╝
+?██║  ██║███████║   ██║   █████╗     ██║   ██║██╔████╔██║█████╗  
+?██║  ██║██╔══██║   ██║   ██╔══╝     ██║   ██║██║╚██╔╝██║██╔══╝  
+?██████╔╝██║  ██║   ██║   ███████╗   ██║   ██║██║ ╚═╝ ██║███████╗
+?╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝   ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝
+*/
   DateTime dateTimeNow = DateTime.now();
   final DateFormat formatTanggal = DateFormat('MMM d, y'); // Mengatur format
 
   Future<void> showTanggal() async {
     final DateTime date = await showDatePicker(
-      helpText: "Pilih tanggal",
+      helpText: al.AppLocalizations.of(context).dateHelpText,
       context: context,
       initialDate: dateTimeNow,
+
       firstDate: DateTime(2020), // batas awal tahun
       lastDate: DateTime(9000),
     ); // batas akhir tahun
@@ -138,7 +163,7 @@ class _BodyInputState extends State<BodyInput> {
       initialTime: isUpdating != true
           ? TimeOfDay.now()
           : TimeOfDay.fromDateTime(dateTime),
-      helpText: "Atur Waktu Kegiatan",
+      helpText: al.AppLocalizations.of(context).timeHelpText,
     );
 
     setState(() {
@@ -157,6 +182,14 @@ class _BodyInputState extends State<BodyInput> {
     });
   }
 
+/* 
+!██╗    ██╗██╗██████╗  ██████╗ ███████╗████████╗
+!██║    ██║██║██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
+!██║ █╗ ██║██║██║  ██║██║  ███╗█████╗     ██║   
+!██║███╗██║██║██║  ██║██║   ██║██╔══╝     ██║   
+!╚███╔███╔╝██║██████╔╝╚██████╔╝███████╗   ██║   
+! ╚══╝╚══╝ ╚═╝╚═════╝  ╚═════╝ ╚══════╝   ╚═╝ 
+*/
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -165,74 +198,85 @@ class _BodyInputState extends State<BodyInput> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* Form bagian mengisi todo */
-          headerForm("Apa yang ingin dikerjakan?"),
+          headerForm(al.AppLocalizations.of(context).whatTodo),
           FormTodo(
-            hintText: "Mau Ngapain?",
+            hintText: al.AppLocalizations.of(context).hintFormTodo,
             controller: controllerTask,
             icon: Icons.notes,
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           // Form bagian mengisi tanggal
-          headerForm("Tanggal Kegiatan"),
+          headerForm(al.AppLocalizations.of(context).dateHeading),
           Padding(padding: EdgeInsets.only(top: 10)),
-          MyTextForm(
+          DateTimeForm(
             onTap: showTanggal,
             controller: controllerTanggal,
-            hintText: "Tanggal Belum Ditentukan",
+            hintText: al.AppLocalizations.of(context).hintDateForm,
             iconData: Icons.date_range_rounded,
+            iconButton: iconBtnX(controllerTanggal),
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
-          controllerTanggal.text != ""
-              ? Column(
-                  // mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headerForm("Waktu Kegiatan"),
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    MyTextForm(
-                        onTap: showJam,
-                        controller: controllerJam,
-                        hintText: "Jam Belum Ditentukan",
-                        iconData: Icons.access_time_outlined),
-                  ],
-                )
-              : Text(""),
+          Visibility(
+              maintainState: true,
+              visible: controllerTanggal.text != "",
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  headerForm(al.AppLocalizations.of(context).timeHeading),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  DateTimeForm(
+                    onTap: showJam,
+                    controller: controllerJam,
+                    hintText: al.AppLocalizations.of(context).hintTimeForm,
+                    iconData: Icons.access_time_outlined,
+                    iconButton: iconBtnX(controllerJam),
+                  ),
+                ],
+              )),
         ],
       ),
     );
   }
-}
 
-/* Class for date form and time form (The second and the third one) */
-class _TextFormState extends State<MyTextForm> {
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      style: TextStyle(
-          color: dateTime.isBefore(DateTime.now()) ? Colors.red : Colors.white,
-          fontWeight: FontWeight.w600),
-      controller: widget.controller,
-      readOnly: true,
-      onTap: widget.onTap,
-      decoration: InputDecoration(
-          icon: Icon(
-            widget.iconData,
-            color: Colors.tealAccent.shade100,
-          ),
-          hintText: widget.hintText,
-          hintStyle: Theme.of(context).textTheme.bodyText1,
-          contentPadding: EdgeInsets.only(bottom: 2),
-          isDense: true,
-          filled: true,
-          enabledBorder: UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).primaryColor, width: 2)),
-          focusedBorder: UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: Theme.of(context).primaryColor, width: 3))),
+  Widget headerForm(String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.headline2,
+    );
+  }
+
+  Widget iconBtnX(TextEditingController controller) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      constraints: BoxConstraints(maxHeight: 20, maxWidth: 20),
+      icon: Icon(Icons.close),
+      color: Colors.white,
+      iconSize: 20,
+      onPressed: () {
+        if (controller == controllerTanggal) {
+          print("Hapus Date");
+          controllerTanggal.clear();
+          controllerJam.clear();
+          dateTime = DateTime(9000);
+        } else {
+          print("Hapus Jam");
+          controllerJam.clear();
+          dateTime = DateTime(9000);
+        }
+        setState(() {});
+      },
     );
   }
 }
+
+/* 
+*██╗███╗   ██╗██████╗ ██╗   ██╗████████╗
+*██║████╗  ██║██╔══██╗██║   ██║╚══██╔══╝
+*██║██╔██╗ ██║██████╔╝██║   ██║   ██║   
+*██║██║╚██╗██║██╔═══╝ ██║   ██║   ██║   
+*██║██║ ╚████║██║     ╚██████╔╝   ██║   
+*╚═╝╚═╝  ╚═══╝╚═╝      ╚═════╝    ╚═╝ 
+ */
 
 /* Class of Form Task (The first one) */
 
@@ -255,10 +299,11 @@ class FormTodo extends StatelessWidget {
           controller: controller,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-              icon: Icon(
-                icon,
-                color: Colors.tealAccent.shade100,
-              ),
+              fillColor: Colors.transparent,
+              icon: Icon(icon,
+                  color: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor),
               hintText: hintText,
               hintStyle: Theme.of(context).textTheme.bodyText1,
               contentPadding: EdgeInsets.only(bottom: 2),
@@ -282,6 +327,53 @@ class FormTodo extends StatelessWidget {
   }
 }
 
+/* Class for date form and time form (The second and the third one) */
+class _DateTimeFormState extends State<DateTimeForm> {
+  DateTime now = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Flexible(
+          fit: FlexFit.tight,
+          child: TextFormField(
+            style: TextStyle(
+                color: dateTime.isBefore(DateTime(
+                        now.year, now.month, now.day, now.hour, now.minute))
+                    ? Colors.red
+                    : Colors.white,
+                fontWeight: FontWeight.w600),
+            controller: widget.controller,
+            readOnly: true,
+            onTap: widget.onTap,
+            decoration: InputDecoration(
+                fillColor: Colors.transparent,
+                icon: Icon(
+                  widget.iconData,
+                  color: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                ),
+                hintText: widget.hintText,
+                hintStyle: Theme.of(context).textTheme.bodyText1,
+                contentPadding: EdgeInsets.only(bottom: 2),
+                isDense: true,
+                filled: true,
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor, width: 2)),
+                focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor, width: 3))),
+          ),
+        ),
+        widget.controller.text != "" ? widget.iconButton : Text("")
+      ],
+    );
+  }
+}
+
 // ignore: must_be_immutable
 class AddToDo extends StatefulWidget {
   bool isUpdate;
@@ -298,13 +390,19 @@ class BodyInput extends StatefulWidget {
 }
 
 // ignore: must_be_immutable
-class MyTextForm extends StatefulWidget {
+class DateTimeForm extends StatefulWidget {
   void Function() onTap;
   TextEditingController controller;
   String hintText;
   IconData iconData;
+  IconButton iconButton;
 
-  MyTextForm({this.onTap, this.controller, this.hintText, this.iconData});
+  DateTimeForm(
+      {this.onTap,
+      this.controller,
+      this.hintText,
+      this.iconData,
+      this.iconButton});
   @override
-  _TextFormState createState() => _TextFormState();
+  _DateTimeFormState createState() => _DateTimeFormState();
 }
