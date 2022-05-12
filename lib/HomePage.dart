@@ -46,60 +46,6 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          "To-do List App",
-          style: Theme.of(context).textTheme.headline1,
-        ),
-        actions: [
-          PopupMenuButton(
-              onSelected: (value) {
-                popMenuItemAction(value);
-              },
-              itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text("Dibuat oleh"),
-                      height: 10,
-                      value: "About",
-                    )
-                  ])
-        ],
-      ),
-      /* Jika tidak ada sesuatu di dalam database maka akan ditampilkan gambar koala, jika tidak tampilkan list todo */
-      body: tasks.length == 0
-          ? Center(
-              child: Image.asset(
-              'assets/img/Koala.png',
-              height: 90,
-            ))
-          : RefreshIndicator(
-              key: _refreshKey,
-              child: listView(),
-              onRefresh: () async {
-                _refreshKey.currentState.show(
-                  atTop: true,
-                );
-                await Future.delayed(Duration(seconds: 2));
-                setState(() {});
-                print("Refresh");
-              }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          /* Pindah ke halaman selanjutnya sambil menunggu kembalian dari halaman selanjutnya dan akan dimasukkan kedalam database */
-          ToDo items = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  fullscreenDialog: true, builder: (context) => AddToDo()));
-          _save(items);
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
 
 
   String subtitleText(ToDo task) {
